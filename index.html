@@ -598,7 +598,25 @@
           />
         </div>
         <h2>Staff Login</h2>
-        <input type="text" id="staffNameInput" placeholder="আপনার নাম লিখুন" />
+
+        <input
+          type="text"
+          id="staffIdInput"
+          placeholder="Staff ID লিখুন"
+          oninput="fillStaffName()"
+        />
+        <input
+          type="text"
+          id="staffNameInput"
+          placeholder="স্টাফের নাম"
+          disabled
+        />
+        <input
+          type="password"
+          id="staffPasswordInput"
+          placeholder="পাসওয়ার্ড লিখুন"
+        />
+
         <select id="floorSelect">
           <option value="">ফ্লোর নির্বাচন করুন</option>
           <option value="1">ফ্লোর 1 (Room 101-105)</option>
@@ -704,9 +722,32 @@
     </div>
 
     <script>
+      const staffCredentials = {
+        superSir: { name: "Super Sir", password: "pass01" },
+        staff02: { name: "Mustak da(New)", password: "pass02" },
+        staff03: { name: "Safiquil Sir", password: "pass03" },
+        staff04: { name: "Kota Baje ?", password: "pass04" },
+        staff05: { name: "GyanBaba", password: "pass05" },
+        staff06: { name: "AyeAye", password: "pass06" },
+        staff07: { name: "Bang", password: "pass07" },
+        staff08: { name: "MoMo", password: "pass08" },
+        staff09: { name: "Chandrachur", password: "pass09" },
+        staff10: { name: "akabaka", password: "pass10" },
+      };
+
+      function fillStaffName() {
+        const id = document.getElementById("staffIdInput").value.trim();
+        const nameInput = document.getElementById("staffNameInput");
+        if (staffCredentials[id]) {
+          nameInput.value = staffCredentials[id].name;
+        } else {
+          nameInput.value = "";
+        }
+      }
+
       // Google Apps Script Web App URL (Replace with your deployed URL)
       const WEB_APP_URL =
-        "https://script.google.com/macros/s/AKfycby5f6rf3ruQm_4Wlm1GVOhKtf77C1ZmE4EwzsylbX4alq9_te5JlDWOGTTW9hlCZhH0/exec";
+        "https://script.google.com/macros/s/AKfycbwmOzpveqe5pm9ryh66k9Du_IC9taF1A5W2Zjf8Me6nkOD5eIjazivHbMdw-1rQCxQynA/exec";
 
       const studentsData = {
         101: [
@@ -1073,26 +1114,57 @@
       const floorRoomMapping = {
         1: ["101", "102", "103", "104", "105"],
         2: ["201", "202", "203", "204", "205"],
-        3: ["301", "302", "304", "305"], // Room 303 is missing in data
-        4: ["401", "402", "403", "404"],
+        3: ["301", "302", "303", "304", "305"],
+        4: ["401", "402", "403", "404"], // Corrected to match data
         5: ["501", "502", "503", "504", "505"],
-        6: ["601", "602", "603", "604"],
+        6: ["601", "602", "603", "604"], // Corrected to match data
       };
 
       // --- Login Screen Functions ---
-      function startAttendance() {
-        staffName = document.getElementById("staffNameInput").value.trim();
-        selectedFloor = document.getElementById("floorSelect").value;
 
-        if (!staffName) {
-          alert("অনুগ্রহ করে আপনার নাম লিখুন।");
+      function fillStaffName() {
+        const id = document.getElementById("staffIdInput").value.trim();
+        const nameInput = document.getElementById("staffNameInput");
+
+        if (staffCredentials[id]) {
+          nameInput.value = staffCredentials[id].name;
+        } else {
+          nameInput.value = "";
+        }
+      }
+
+      function startAttendance() {
+        const staffId = document.getElementById("staffIdInput").value.trim();
+        const staffPassword = document
+          .getElementById("staffPasswordInput")
+          .value.trim();
+        const floor = document.getElementById("floorSelect").value;
+
+        if (!staffId || !staffPassword) {
+          alert("অনুগ্রহ করে ID ও Password দিন।");
           return;
         }
-        if (!selectedFloor) {
+
+        if (!(staffId in staffCredentials)) {
+          alert("এই ID পাওয়া যায়নি!");
+          return;
+        }
+
+        if (staffCredentials[staffId].password !== staffPassword) {
+          alert("Password ভুল!");
+          return;
+        }
+
+        if (!floor) {
           alert("অনুগ্রহ করে একটি ফ্লোর নির্বাচন করুন।");
           return;
         }
 
+        // Save staff name from credentials
+        staffName = staffCredentials[staffId].name;
+        selectedFloor = floor;
+
+        // Filter rooms based on the selected floor and available data
         floorRooms = floorRoomMapping[selectedFloor].filter((room) =>
           allRooms.includes(room)
         );
@@ -1110,11 +1182,14 @@
       // Initialize attendance - everyone starts as present
       function initializeAttendance() {
         floorRooms.forEach((room) => {
-          studentsData[room].forEach((student) => {
-            if (attendance[student.reg] === undefined) {
-              attendance[student.reg] = "present";
-            }
-          });
+          if (studentsData[room]) {
+            // Ensure room data exists
+            studentsData[room].forEach((student) => {
+              if (attendance[student.reg] === undefined) {
+                attendance[student.reg] = "present";
+              }
+            });
+          }
         });
       }
 
@@ -1140,11 +1215,14 @@
         const roomButtonsContainer = document.getElementById("roomButtons");
         roomButtonsContainer.innerHTML = ""; // Clear previous buttons
         floorRooms.forEach((room, index) => {
-          const button = document.createElement("button");
-          button.className = "room-btn";
-          button.textContent = `Room ${room} (${studentsData[room].length})`;
-          button.onclick = () => switchToRoom(index);
-          roomButtonsContainer.appendChild(button);
+          if (studentsData[room]) {
+            // Ensure room data exists
+            const button = document.createElement("button");
+            button.className = "room-btn";
+            button.textContent = `Room ${room} (${studentsData[room].length})`;
+            button.onclick = () => switchToRoom(index);
+            roomButtonsContainer.appendChild(button);
+          }
         });
       }
 
@@ -1162,14 +1240,17 @@
 
         const results = [];
         floorRooms.forEach((room) => {
-          studentsData[room].forEach((student) => {
-            if (
-              student.name.toLowerCase().includes(searchTerm) ||
-              student.reg.toLowerCase().includes(searchTerm)
-            ) {
-              results.push({ ...student, room });
-            }
-          });
+          if (studentsData[room]) {
+            // Ensure room data exists
+            studentsData[room].forEach((student) => {
+              if (
+                student.name.toLowerCase().includes(searchTerm) ||
+                student.reg.toLowerCase().includes(searchTerm)
+              ) {
+                results.push({ ...student, room });
+              }
+            });
+          }
         });
 
         searchResults.innerHTML = "";
@@ -1195,6 +1276,11 @@
           document.getElementById("searchInput").value = "";
           document.getElementById("searchResults").innerHTML = "";
           setTimeout(() => {
+            // Clear login fields after successful search/highlight
+            document.getElementById("staffIdInput").value = "";
+            document.getElementById("staffPasswordInput").value = "";
+            document.getElementById("staffNameInput").value = "";
+
             highlightedStudent = null;
             updateRoomDisplay();
           }, 2000);
@@ -1221,6 +1307,17 @@
       function updateRoomDisplay() {
         const currentRoom = floorRooms[currentRoomIndex];
         const students = studentsData[currentRoom];
+
+        if (!students) {
+          // Handle case where room data might be missing
+          document.getElementById(
+            "roomTitle"
+          ).textContent = `Room ${currentRoom} - No Data`;
+          document.getElementById("studentList").innerHTML =
+            "<p style='text-align: center; color: #6c757d;'>এই রুমে কোনো শিক্ষার্থীর ডেটা পাওয়া যায়নি।</p>";
+          updateStats();
+          return;
+        }
 
         document.getElementById(
           "roomTitle"
@@ -1286,9 +1383,12 @@
       // Mark all present for the current room
       function markAllPresent() {
         const currentRoom = floorRooms[currentRoomIndex];
-        studentsData[currentRoom].forEach((student) => {
-          attendance[student.reg] = "present";
-        });
+        if (studentsData[currentRoom]) {
+          // Ensure room data exists
+          studentsData[currentRoom].forEach((student) => {
+            attendance[student.reg] = "present";
+          });
+        }
         updateRoomDisplay();
         updateProgress();
       }
@@ -1317,18 +1417,23 @@
 
         let presentCount = 0;
         let absentCount = 0;
+        let totalStudentsInRoom = 0;
 
-        students.forEach((student) => {
-          if (attendance[student.reg] === "present") {
-            presentCount++;
-          } else {
-            absentCount++;
-          }
-        });
+        if (students) {
+          // Ensure students array exists
+          totalStudentsInRoom = students.length;
+          students.forEach((student) => {
+            if (attendance[student.reg] === "present") {
+              presentCount++;
+            } else {
+              absentCount++;
+            }
+          });
+        }
 
         document.getElementById("presentCount").textContent = presentCount;
         document.getElementById("absentCount").textContent = absentCount;
-        document.getElementById("totalCount").textContent = students.length;
+        document.getElementById("totalCount").textContent = totalStudentsInRoom;
       }
 
       // Update overall progress for the selected floor
@@ -1337,12 +1442,15 @@
         let presentStudents = 0;
 
         floorRooms.forEach((room) => {
-          studentsData[room].forEach((student) => {
-            totalStudents++;
-            if (attendance[student.reg] === "present") {
-              presentStudents++;
-            }
-          });
+          if (studentsData[room]) {
+            // Ensure room data exists
+            studentsData[room].forEach((student) => {
+              totalStudents++;
+              if (attendance[student.reg] === "present") {
+                presentStudents++;
+              }
+            });
+          }
         });
 
         const progressPercentage =
@@ -1374,19 +1482,22 @@
         const absentStudents = [];
 
         floorRooms.forEach((room) => {
-          studentsData[room].forEach((student) => {
-            const status = attendance[student.reg] || "present";
-            attendanceData.push({
-              room: room,
-              reg: student.reg,
-              name: student.name,
-              class: student.class,
-              status: status,
+          if (studentsData[room]) {
+            // Ensure room data exists
+            studentsData[room].forEach((student) => {
+              const status = attendance[student.reg] || "present";
+              attendanceData.push({
+                room: room,
+                reg: student.reg,
+                name: student.name,
+                class: student.class,
+                status: status,
+              });
+              if (status === "absent") {
+                absentStudents.push(`${student.reg} - ${student.name}`);
+              }
             });
-            if (status === "absent") {
-              absentStudents.push(`${student.reg} - ${student.name}`);
-            }
-          });
+          }
         });
 
         const payload = {
@@ -1415,20 +1526,25 @@
           alert("অ্যাটেনডেন্স সফলভাবে জমা হয়েছে!");
 
           setTimeout(() => {
-            // attendance screen লুকিয়ে login screen দেখানো হচ্ছে
+            // attendance screen back login screen দেখানো হচ্ছে
             document.getElementById("attendanceSystem").classList.add("hidden");
             document.getElementById("loginScreen").classList.remove("hidden");
 
-            // input ফিল্ড গুলো reset করা হচ্ছে
+            // Clear login fields for next login
+            document.getElementById("staffIdInput").value = "";
+            document.getElementById("staffPasswordInput").value = "";
             document.getElementById("staffNameInput").value = "";
             document.getElementById("floorSelect").value = "";
 
-            // reset global variables
+            // Reset attendance system state
             attendance = {};
             currentRoomIndex = 0;
             highlightedStudent = null;
-            updateProgress();
-          }, 1500); // ১.৫ সেকেন্ড পরে redirect হবে
+            staffName = "";
+            selectedFloor = "";
+            floorRooms = []; // Clear floorRooms
+            updateProgress(); // Reset progress display
+          }, 1000); // after 1 sec refresh
         } catch (error) {
           console.error("Error submitting attendance:", error);
           alert(
