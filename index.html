@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Al Ameen Mission Academy Nayabaz Attendance Tracker</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+      /* Existing CSS styles remain here */
+      .logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .room-buttons-wrapper {
+        overflow-x: auto;
+        padding-bottom: 5px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .room-buttons-wrapper::-webkit-scrollbar {
+        display: none;
+      }
+
+      @media (max-width: 480px) {
+        .room-btn {
+          font-size: 11px;
+          padding: 8px 10px;
+          white-space: nowrap;
+        }
+      }
+
+      .room-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: nowrap;
+        min-width: max-content;
+      }
+
+      .nav-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(15, 76, 117, 0.3);
+        transition: all 0.3s ease;
+      }
+      .nav-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #3282b8 0%, #0f4c75 100%);
+        box-shadow: 0 6px 12px rgba(15, 76, 117, 0.4);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f4c75 0%,
+          #3282b8 50%,
+          #bbe1fa 100%
+        );
+        min-height: 100vh;
+        padding: 10px;
+      }
+
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        padding: 20px;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="islamic-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/><path d="M10 5 L15 10 L10 15 L5 10 Z" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23islamic-pattern)"/></svg>')
+          repeat;
+        z-index: 1;
+      }
+
+      .header-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        border: 3px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .header h1 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-weight: 600;
+      }
+
+      .date-selector {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 10px;
+      }
+
+      .date-inputs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .date-inputs select {
+        padding: 8px;
+        border: none;
+        border-radius: 5px;
+        background: white;
+        font-size: 14px;
+      }
+
+      .room-nav {
+        padding: 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .room-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 15px;
+      }
+
+      .room-btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 20px;
+        background: #e9ecef;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 12px;
+      }
+
+      .room-btn.active {
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(15, 76, 117, 0.4);
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+      }
+
+      .nav-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 15px;
+        background: #6c757d;
+        color: white;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .search-section {
+        padding: 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #3282b8;
+        box-shadow: 0 0 10px rgba(50, 130, 184, 0.2);
+      }
+
+      .search-results {
+        margin-top: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .search-result-item {
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+      }
+
+      .search-result-item:hover {
+        background: #f8f9fa;
+        transform: translateY(-1px);
+      }
+
+      .search-result-name {
+        font-weight: 600;
+        color: #495057;
+        font-size: 14px;
+      }
+
+      .search-result-details {
+        color: #6c757d;
+        font-size: 12px;
+      }
+
+      .content {
+        padding: 20px;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+
+      .room-title {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #495057;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .student-card {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .student-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .student-card.present {
+        border-color: #0f4c75;
+        background: linear-gradient(135deg, #e8f4fd 0%, #d1e7f0 100%);
+        border-left: 4px solid #0f4c75;
+      }
+
+      .student-card.absent {
+        border-color: #dc3545;
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border-left: 4px solid #dc3545;
+      }
+
+      .student-card.highlighted {
+        border-color: #ffd700;
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border-left: 4px solid #ffd700;
+        animation: highlight 1s ease-in-out;
+      }
+
+      @keyframes highlight {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .student-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .student-name {
+        font-weight: 600;
+        color: #495057;
+        font-size: 14px;
+      }
+
+      .student-reg {
+        color: #6c757d;
+        font-size: 12px;
+      }
+
+      .attendance-status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .status-indicator {
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .status-present {
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 5px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(15, 76, 117, 0.3);
+      }
+
+      .status-absent {
+        background: #dc3545;
+        color: white;
+      }
+
+      .toggle-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .toggle-present {
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 5px 12px;
+        font-size: 11px;
+        box-shadow: 0 2px 4px rgba(15, 76, 117, 0.3);
+      }
+
+      .toggle-absent {
+        background: #dc3545;
+        color: white;
+      }
+
+      .actions {
+        padding: 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+      }
+
+      .action-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .mark-all-btn {
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        color: white;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 8px rgba(15, 76, 117, 0.3);
+      }
+
+      .mark-all-btn:hover {
+        background: linear-gradient(135deg, #3282b8 0%, #0f4c75 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(15, 76, 117, 0.4);
+      }
+
+      .export-btn {
+        background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+        color: #0f4c75;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+      }
+
+      .export-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, #ffa500 0%, #ffd700 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4);
+      }
+
+      .export-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+
+      .progress {
+        margin-top: 15px;
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        transition: width 0.3s ease;
+        border-radius: 10px;
+      }
+
+      .progress-text {
+        text-align: center;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: white;
+        border-radius: 10px;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 18px;
+        font-weight: bold;
+        color: #495057;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .stat-present {
+        color: #0f4c75;
+        font-weight: bold;
+      }
+
+      .stat-absent {
+        color: #dc3545;
+      }
+
+      /* New styles for login screen */
+      .login-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(
+          135deg,
+          #0f4c75 0%,
+          #3282b8 50%,
+          #bbe1fa 100%
+        );
+      }
+
+      .login-box {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%;
+        max-width: 350px;
+      }
+
+      .login-box h2 {
+        color: #0f4c75;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+      }
+
+      .login-box input,
+      .login-box select {
+        width: calc(100% - 20px);
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 16px;
+      }
+
+      .login-box button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .login-box button:hover {
+        background: linear-gradient(135deg, #3282b8 0%, #0f4c75 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(15, 76, 117, 0.4);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          margin: 0;
+          border-radius: 0;
+          min-height: 100vh;
+        }
+
+        .date-inputs {
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .date-inputs select {
+          width: 100%;
+        }
+
+        .student-info {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .attendance-status {
+          width: 100%;
+          justify-content: space-between;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+      <div class="login-box">
+        <div class="logo">
+          <img
+            src="https://play-lh.googleusercontent.com/gufR1twVlU6_SzC-iIAD_8bLLf-XYVAwwwwJF-cphD32IX0GeHNLi4GrN42hRYDHg-A"
+            alt="Logo"
+            style="width: 100%; height: 100%; border-radius: 50%"
+          />
+        </div>
+        <h2>Staff Login</h2>
+        <input type="text" id="staffNameInput" placeholder="আপনার নাম লিখুন" />
+        <select id="floorSelect">
+          <option value="">ফ্লোর নির্বাচন করুন</option>
+          <option value="1">ফ্লোর 1 (Room 101-105)</option>
+          <option value="2">ফ্লোর 2 (Room 201-205)</option>
+          <option value="3">ফ্লোর 3 (Room 301-305)</option>
+          <option value="4">ফ্লোর 4 (Room 401-404)</option>
+          <option value="5">ফ্লোর 5 (Room 501-505)</option>
+          <option value="6">ফ্লোর 6 (Room 601-604)</option>
+        </select>
+        <button onclick="startAttendance()">শুরু করুন</button>
+      </div>
+    </div>
+
+    <!-- Main Attendance System -->
+    <div id="attendanceSystem" class="container hidden">
+      <div class="header">
+        <div class="header-content">
+          <div class="logo">
+            <img
+              src="https://play-lh.googleusercontent.com/gufR1twVlU6_SzC-iIAD_8bLLf-XYVAwwwwJF-cphD32IX0GeHNLi4GrN42hRYDHg-A"
+              alt="Logo"
+              style="width: 100%; height: 100%; border-radius: 50%"
+            />
+          </div>
+
+          <h1>Al Ameen Mission Academy Nayabaz</h1>
+          <p style="font-size: 14px; opacity: 0.9; margin-top: 5px">
+            📋 Attendance Tracker
+          </p>
+        </div>
+        <div class="date-selector">
+          <div class="date-inputs">
+            <select id="daySelect" disabled></select>
+            <select id="monthSelect" disabled></select>
+            <select id="yearSelect" disabled></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-section">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="🔍 নাম বা রেজিস্ট্রেশন নম্বর দিয়ে খুঁজুন..."
+          oninput="searchStudents()"
+        />
+        <div id="searchResults" class="search-results"></div>
+      </div>
+
+      <div class="room-nav">
+        <div class="room-buttons-wrapper">
+          <div class="room-buttons" id="roomButtons"></div>
+        </div>
+
+        <div class="navigation">
+          <button class="nav-btn" id="prevBtn" onclick="navigateRoom(-1)">
+            ← Previous
+          </button>
+          <button class="nav-btn" id="nextBtn" onclick="navigateRoom(1)">
+            Next →
+          </button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="room-title" id="roomTitle"></div>
+
+        <div class="stats">
+          <div class="stat-item">
+            <div class="stat-number stat-present" id="presentCount">0</div>
+            <div class="stat-label">হাজির</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number stat-absent" id="absentCount">0</div>
+            <div class="stat-label">অনুপস্থিত</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" id="totalCount">0</div>
+            <div class="stat-label">মোট</div>
+          </div>
+        </div>
+
+        <div id="studentList"></div>
+      </div>
+
+      <div class="actions">
+        <button class="action-btn mark-all-btn" onclick="markAllPresent()">
+          ✅ সবাইকে হাজির করুন
+        </button>
+        <button
+          class="action-btn export-btn"
+          id="submitBtn"
+          onclick="submitAttendance()"
+        >
+          ✅ অ্যাটেনডেন্স জমা দিন
+        </button>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText"></div>
+      </div>
+    </div>
+
+    <script>
+      // Google Apps Script Web App URL (Replace with your deployed URL)
+      const WEB_APP_URL =
+        "https://script.google.com/macros/s/AKfycbyqJCOYDmaCp-34m-v3P8UwR_SCWWfB4KPF5dVns3dumIjbosfISfVLpMi0KsNO10KMfw/exec";
+
+      const studentsData = {
+        101: [
+          { reg: "36196", name: "MD AAWESH RAZA", class: "XI" },
+          { reg: "41061", name: "NAJMUS SADAT", class: "XI" },
+          { reg: "41451", name: "MD AZIZ HOSSAIN", class: "XI" },
+          { reg: "45332", name: "ARMAN ISLAM", class: "XI" },
+          { reg: "49133", name: "FAISAL PARVEG ANSARI", class: "XI" },
+          { reg: "70776", name: "SOHAN TARAFDAR", class: "XI" },
+          { reg: "70781", name: "ARIF MONDAL", class: "XI" },
+          { reg: "70782", name: "ABU RAIHAN", class: "XI" },
+          { reg: "70786", name: "OWAKIL AHAMED", class: "XI" },
+          { reg: "70790", name: "IMRAN RAHAMAN", class: "XI" },
+          { reg: "70983", name: "NAWAZ MONDAL", class: "XI" },
+          { reg: "71003", name: "MANJUR ALAM", class: "XI" },
+          { reg: "71062", name: "MD HAYATULLA", class: "XI" },
+        ],
+        102: [
+          { reg: "35611", name: "SOHAIL RANA SARDAR", class: "XI" },
+          { reg: "41354", name: "RAJJAB ALI", class: "XI" },
+          { reg: "49614", name: "ISHAD HASSAN", class: "XI" },
+          { reg: "54514", name: "RUMAN SANI", class: "XI" },
+          { reg: "54800", name: "AHMAD", class: "XI" },
+          { reg: "56378", name: "SAKIL AKHTAR", class: "XI" },
+          { reg: "70785", name: "ASRAFUL MIRZA", class: "XI" },
+          { reg: "70808", name: "ATIF UDDIN MONDAL", class: "XI" },
+          { reg: "70840", name: "SHAMIM MONDAL", class: "XI" },
+          { reg: "70952", name: "TAHIR AZIZ", class: "XI" },
+          { reg: "71925", name: "ROHIT HOQUE", class: "XI" },
+        ],
+        103: [
+          { reg: "36553", name: "LABIB RAHAMAN", class: "XI" },
+          { reg: "41767", name: "NUR ALAM", class: "XI" },
+          { reg: "54535", name: "MD RAHMAN HOSSIN", class: "XI" },
+          { reg: "54709", name: "SAYAN SARDAR", class: "XI" },
+          { reg: "55192", name: "ISHAYAT HASAN", class: "XI" },
+          { reg: "70868", name: "ASIM AKTAR", class: "XI" },
+          { reg: "70886", name: "MD MINHAZUDDIN GOLDER", class: "XI" },
+        ],
+        104: [
+          { reg: "41034", name: "SK MD ASHIF", class: "XI" },
+          { reg: "41037", name: "SK NAZIB UR RAHAMAN", class: "XI" },
+          { reg: "41202", name: "ENAMUL KABIR", class: "XI" },
+          { reg: "45091", name: "MD AKRAM", class: "XI" },
+          { reg: "49216", name: "TANBIR SK", class: "XI" },
+          { reg: "49355", name: "ZAHIN ANAN", class: "XI" },
+          { reg: "49916", name: "MD TOWQIR REZA", class: "XI" },
+          { reg: "49966", name: "AARIYAN SHEIK", class: "XI" },
+          { reg: "54636", name: "TASHMIA MOTIUR RAHAMAN", class: "XI" },
+          { reg: "70862", name: "SK JISHAN UDDIN", class: "XI" },
+          { reg: "71566", name: "DILUYAR HOSSAIN ANSARI", class: "XI" },
+        ],
+        105: [
+          { reg: "36445", name: "SK NABIDUL HASAN RAJ", class: "XI" },
+          { reg: "46130", name: "FAHIM AL ROSE", class: "XI" },
+          { reg: "49659", name: "HAMID RAJA", class: "XI" },
+          { reg: "54572", name: "NAFEES ALAM MONDAL", class: "XI" },
+          { reg: "70778", name: "TAFHIM TAMAM", class: "XI" },
+          { reg: "70784", name: "NAJME ALAM", class: "XI" },
+          { reg: "70882", name: "MD KASED MONDAL", class: "XI" },
+          { reg: "70937", name: "SAHARUL ISLAM", class: "XI" },
+          { reg: "71053", name: "IJAJ AHAMMED MONDAL", class: "XI" },
+          { reg: "71193", name: "MD HASIM AKTAR", class: "XI" },
+        ],
+        201: [
+          { reg: "35143", name: "MIYARAJ MOLLA", class: "XI" },
+          { reg: "35567", name: "SAYEL HOSSAIN", class: "XI" },
+          { reg: "36073", name: "MD SOHEL ISLAM", class: "XI" },
+          { reg: "41421", name: "ARIYAN AHAMED", class: "XI" },
+          { reg: "49552", name: "TANZIM ISLAM", class: "XI" },
+          { reg: "49870", name: "SAMIM AKTHER", class: "XI" },
+          { reg: "49888", name: "SK ABABIL HOQUE", class: "XI" },
+          { reg: "54527", name: "SAHIN ALAM", class: "XI" },
+          { reg: "54892", name: "MOHAMMAD ANAS SIDDIQUE", class: "XI" },
+          { reg: "55056", name: "MINHAJ MONDAL", class: "XI" },
+          { reg: "55633", name: "BABU NASIM REJA", class: "XI" },
+          { reg: "55650", name: "MISBAUL HAQUE", class: "XI" },
+          { reg: "70779", name: "NAYEM REJA MONDAL", class: "XI" },
+          { reg: "70780", name: "RIYAJ UDDIN DARJEE", class: "XI" },
+          { reg: "70800", name: "AQEEL ABRAR", class: "XI" },
+          { reg: "70819", name: "AL MASUM LASKAR", class: "XI" },
+          { reg: "70933", name: "MD KHURSHID ALAM", class: "XI" },
+          { reg: "71088", name: "HABIBUR SK", class: "XI" },
+        ],
+        202: [
+          { reg: "35542", name: "MASUM ALI", class: "XI" },
+          { reg: "36359", name: "MD ARIJ AFTAB", class: "XI" },
+          { reg: "41156", name: "MD ABDUL SANARUL SK", class: "XI" },
+          { reg: "45648", name: "ASHIK EKBAL", class: "XI" },
+          { reg: "49518", name: "SAKIB REJA", class: "XI" },
+          { reg: "50221", name: "DILDAR SHEIKH", class: "XI" },
+          { reg: "50978", name: "SABIR ALAM", class: "XI" },
+          { reg: "51602", name: "TUHIN HOSSAIN SHAIKH", class: "XI" },
+          { reg: "54365", name: "TANVIR IQBAL", class: "XI" },
+          { reg: "54468", name: "MD ABUL KALAM AZAD", class: "XI" },
+          { reg: "55188", name: "MD KAMRAN KHAN", class: "XI" },
+          { reg: "70789", name: "MIR MISBAHUL HOQUE", class: "XI" },
+          { reg: "71040", name: "SUHAN SARDAR", class: "XI" },
+        ],
+        203: [
+          { reg: "36253", name: "SAIFUL ISLAM", class: "XI" },
+          { reg: "36937", name: "MD SAKHAWAT HOSSAIN", class: "XI" },
+          { reg: "46276", name: "AKSAR AMANAT ALI", class: "XI" },
+          { reg: "48991", name: "MD MIMHAZ HOSSAIN", class: "XI" },
+          { reg: "49178", name: "SIYAM FERDOUS", class: "XI" },
+          { reg: "49247", name: "NIZAM UDDIN SHEIKH", class: "XI" },
+          { reg: "54658", name: "SAKIB HOSSAIN", class: "XI" },
+          { reg: "70787", name: "SHAYAR BAIDYA", class: "XI" },
+          { reg: "70816", name: "FAHMID KALAM", class: "XI" },
+          { reg: "70926", name: "ALFARHAD SHEIKH", class: "XI" },
+        ],
+        204: [
+          { reg: "35407", name: "RASEL SK", class: "XI" },
+          { reg: "36254", name: "ARIYAN SK", class: "XI" },
+          { reg: "41177", name: "MD RIHAN SAJJAD SK", class: "XI" },
+          { reg: "44722", name: "MOHAMMAD REJA", class: "XI" },
+          { reg: "45251", name: "SK MAHATAB ALAM", class: "XI" },
+          { reg: "45437", name: "RIYAJ ALAM", class: "XI" },
+          { reg: "49280", name: "MAHAFUJ RAHAMAN", class: "XI" },
+          { reg: "49955", name: "MD ROHIT SEIKH", class: "XI" },
+          { reg: "50102", name: "ASHIF MISTRY", class: "XI" },
+          { reg: "51140", name: "MIR WAZUDDIN", class: "XI" },
+          { reg: "54935", name: "SK MOINUL ISLAM", class: "XI" },
+          { reg: "56934", name: "MD BULBUL HASAN", class: "XI" },
+          { reg: "57878", name: "HASIBUR RAHAMAN", class: "XI" },
+        ],
+        205: [
+          { reg: "34911", name: "ABU HASNATH LASKAR", class: "XI" },
+          { reg: "35777", name: "ABDUL NAYEEM", class: "XI" },
+          { reg: "36354", name: "MD SAIRUL ALAM", class: "XI" },
+          { reg: "41200", name: "MD RABIUL ALAM", class: "XI" },
+          { reg: "44728", name: "MD AFIF SARKAR", class: "XI" },
+          { reg: "45477", name: "SK SAMIRUDDIN", class: "XI" },
+          { reg: "45486", name: "IMRAN NAJIR", class: "XI" },
+          { reg: "49703", name: "ASFAQUR RAHAMAN", class: "XI" },
+          { reg: "54780", name: "RAIYAN MONDAL", class: "XI" },
+          { reg: "70863", name: "A R WASIM AKTER", class: "XI" },
+          { reg: "70925", name: "SORIFUL MONDAL", class: "XI" },
+          { reg: "70965", name: "SAHEN RAHAMAN", class: "XI" },
+          { reg: "70972", name: "AL MAMUN SHAIKH", class: "XI" },
+        ],
+        301: [
+          { reg: "30950", name: "WASIM BISWAS", class: "XII" },
+          { reg: "31514", name: "MD RAJIBUL HOSSAIN", class: "XII" },
+          { reg: "31773", name: "SAHIL SK", class: "XII" },
+          { reg: "36362", name: "MD AAKIQUE", class: "XII" },
+          { reg: "36954", name: "SK JAMIRUDDIN", class: "XII" },
+          { reg: "41802", name: "KASHIF IMRAN HOSSAIN", class: "XII" },
+          { reg: "44237", name: "WASIQUR RAHAMAN", class: "XII" },
+          { reg: "44483", name: "IBRAHIM SK", class: "XII" },
+          { reg: "44674", name: "TANMOY MALLICK", class: "XII" },
+          { reg: "44824", name: "SOUKAT JAHID", class: "XII" },
+          { reg: "45106", name: "AMINUL KABIR", class: "XII" },
+          { reg: "50181", name: "MD SAKIL AHMED ANSARI", class: "XII" },
+          { reg: "63902", name: "ATIK SHIHAB MIDDEY", class: "XII" },
+          { reg: "64121", name: "AMIRUL ALAM", class: "XII" },
+          { reg: "64344", name: "SK TOUFIK UDDIN", class: "XII" },
+        ],
+        302: [
+          { reg: "30872", name: "KAZI MUSAD ALAM", class: "XII" },
+          { reg: "31429", name: "MD IKBAL KARIM", class: "XII" },
+          { reg: "35669", name: "MOBARAK KHAN", class: "XII" },
+          { reg: "36902", name: "HABIBUR RAHAMAN", class: "XII" },
+          { reg: "44368", name: "SK AMAN RAJ", class: "XII" },
+          { reg: "44580", name: "MD ASIF", class: "XII" },
+          { reg: "49208", name: "PARVEJ MALLICK", class: "XII" },
+          { reg: "49648", name: "MD FARHAT HOSSAIN", class: "XII" },
+          { reg: "63873", name: "ADIL SANFUI", class: "XII" },
+          { reg: "63882", name: "SAYAN RAHAMAN", class: "XII" },
+          { reg: "63921", name: "MD WAJAHAT ALI", class: "XII" },
+        ],
+        304: [
+          { reg: "31179", name: "BELAL HOSEN KHAN", class: "XII" },
+          { reg: "31714", name: "IMRAN HOSSAIN", class: "XII" },
+          { reg: "31761", name: "AJWAD AS SABUR", class: "XII" },
+          { reg: "39688", name: "RAIHAN AHAMED", class: "XII" },
+          { reg: "39804", name: "ABTAB HOSSAIN", class: "XII" },
+          { reg: "40457", name: "FARHAN RAHAMAN", class: "XII" },
+          { reg: "49557", name: "ROBIUL ISLAM", class: "XII" },
+          { reg: "63878", name: "ABDUL WAHID MONDAL", class: "XII" },
+          { reg: "63885", name: "JISANUR ISLAM", class: "XII" },
+          { reg: "63901", name: "RUBEL MIAH", class: "XII" },
+          { reg: "63956", name: "MD ISHTIAQUE KHAN", class: "XII" },
+          { reg: "64037", name: "MD ABDULLAH AHSAN LASKAR", class: "XII" },
+        ],
+        305: [
+          { reg: "30893", name: "SAKIL SK", class: "XII" },
+          { reg: "32018", name: "SARFARAJ SK", class: "XII" },
+          { reg: "32586", name: "NIJAMUDDIN AHAMED", class: "XII" },
+          { reg: "32609", name: "MD ALAUDDIN SK", class: "XII" },
+          { reg: "36537", name: "SAMIUL RAHAMAN", class: "XII" },
+          { reg: "44457", name: "MD SHAHIDULLA", class: "XII" },
+          { reg: "45212", name: "TAHIDUL ISLAM", class: "XII" },
+          { reg: "49563", name: "KISMATULLAH", class: "XII" },
+          { reg: "49719", name: "SWAPNIL KHAN", class: "XII" },
+          { reg: "49729", name: "RAHAT SARKAR", class: "XII" },
+          { reg: "63890", name: "ANISH ALAM", class: "XII" },
+          { reg: "63891", name: "AFRIDI SK", class: "XII" },
+          { reg: "64155", name: "MD MIZANUR RAHMAN", class: "XII" },
+        ],
+        401: [
+          { reg: "26381", name: "RAHIK HASSAN MONDAL", class: "NEET A" },
+          { reg: "27243", name: "MD PARVAGE MOSARAF", class: "NEET A" },
+          { reg: "30499", name: "MIRJA RAJ", class: "NEET A" },
+          { reg: "35378", name: "SAYAN SK", class: "NEET A" },
+          { reg: "36308", name: "ASHADUL SK", class: "NEET A" },
+          { reg: "36812", name: "LIMAN AKTAR", class: "NEET A" },
+          { reg: "39886", name: "SK RAJIBUL HOSSAIN", class: "NEET A" },
+          { reg: "40046", name: "MD IBRAHIM MUNSI", class: "NEET A" },
+          { reg: "40167", name: "HABIBUR RAHAMAN MIAH", class: "NEET A" },
+          { reg: "44754", name: "MOJAHIDUL ISLAM", class: "NEET A" },
+          { reg: "45006", name: "TALHA HALDER", class: "NEET A" },
+          { reg: "47015", name: "Md Wasim Sk", class: "NEET A" },
+          { reg: "47191", name: "REHAN LASKAR", class: "NEET A" },
+          { reg: "47248", name: "MUNSHI TOUKIR JIYA", class: "NEET A" },
+          { reg: "58290", name: "REJOYAN ALAM", class: "NEET A" },
+          { reg: "58419", name: "REHAN AKTAR", class: "NEET A" },
+          { reg: "72112", name: "Najmul Hossen Chaprashi", class: "NEET A" },
+        ],
+        402: [
+          { reg: "28286", name: "NABID UL FAHAD", class: "NEET A" },
+          { reg: "28333", name: "MOHAIMENUL ISLAM", class: "NEET A" },
+          { reg: "35978", name: "SK SANWAZZ HOSSAIN MONDAL", class: "NEET A" },
+          { reg: "36338", name: "MD RIYAMIN ALI", class: "NEET A" },
+          { reg: "39774", name: "RAIYAN HOQUE", class: "NEET A" },
+          { reg: "41564", name: "MD ZUBAYER", class: "NEET A" },
+          { reg: "45269", name: "ROUSAN TANVIR ISLAM", class: "NEET A" },
+          { reg: "58045", name: "MD SAHIN AKTAR", class: "NEET A" },
+          { reg: "58265", name: "RIHAB ARSALAN", class: "NEET A" },
+          { reg: "72102", name: "SK IMTIYAZ HOSEN", class: "NEET A" },
+          { reg: "72116", name: "Tanveer Rahaman Biswas", class: "NEET A" },
+          { reg: "72144", name: "Sk Md Nasim Aktar", class: "NEET A" },
+        ],
+        403: [
+          { reg: "27120", name: "MISBAHUR RAHAMAN MOLLAH", class: "NEET A" },
+          { reg: "35512", name: "Labib Muaz Abidin", class: "NEET A" },
+          { reg: "35681", name: "IMDADUL ISLAM", class: "NEET A" },
+          { reg: "37081", name: "MD ARIF HOSSAIN", class: "NEET A" },
+          { reg: "58003", name: "MD ARBAZ HOSSAIN", class: "NEET A" },
+          { reg: "58015", name: "SAFIKUL ALAM", class: "NEET A" },
+          { reg: "58087", name: "KIFAYAT CHOWDHURY", class: "NEET A" },
+          { reg: "58228", name: "MD AFSAN", class: "NEET A" },
+          { reg: "58278", name: "Md Nayel", class: "NEET A" },
+          { reg: "72109", name: "Imran Saikh", class: "NEET A" },
+          { reg: "72124", name: "Seikh Shyfur Rahaman", class: "NEET A" },
+        ],
+        404: [
+          { reg: "26820", name: "SALMAN HOSSAIN", class: "NEET A" },
+          { reg: "28452", name: "ABDUL KAIYUM SHAIKH", class: "NEET A" },
+          { reg: "30856", name: "SIRAJUDDIN SEKH", class: "NEET A" },
+          { reg: "39684", name: "RIYAJUL ISLAM", class: "NEET A" },
+          { reg: "39745", name: "RANA MONDAL", class: "NEET A" },
+          { reg: "40319", name: "ABDUL IDBAR SK", class: "NEET A" },
+          { reg: "44188", name: "KHONDAKAR NUR AMIN", class: "NEET A" },
+          { reg: "44219", name: "GULAM GAWS", class: "NEET A" },
+          { reg: "44539", name: "MD INTEKHAB ALAM", class: "NEET A" },
+          { reg: "58095", name: "SK TEHSIN ALAM", class: "NEET A" },
+          { reg: "58259", name: "SAMIUL AKTAR", class: "NEET A" },
+          { reg: "72083", name: "Riyaj Sk", class: "NEET A" },
+          { reg: "72086", name: "Md Asfak Hossain", class: "NEET A" },
+          { reg: "72235", name: "MOHAMMAD WASIQ", class: "NEET A" },
+        ],
+        501: [
+          { reg: "28430", name: "Ashik Mohammad Molla", class: "NEET B" },
+          { reg: "28753", name: "MD RIYAJUL ISLAM", class: "NEET B" },
+          { reg: "47883", name: "Sk Sahenawaz", class: "NEET B" },
+          { reg: "47884", name: "Golam Masum", class: "NEET B" },
+          { reg: "47958", name: "Sahajad Ali", class: "NEET B" },
+          { reg: "51717", name: "Ashiq Ikbal", class: "NEET B" },
+          { reg: "72167", name: "Reaj Hassan", class: "NEET B" },
+          { reg: "72186", name: "Imtiaz Reza", class: "NEET B" },
+        ],
+        502: [
+          { reg: "18826", name: "Raihan Reza", class: "NEET B" },
+          { reg: "19263", name: "Nasrul Sk", class: "NEET B" },
+          { reg: "22245", name: "Atabur Rahaman", class: "NEET B" },
+          { reg: "31131", name: "Hashir Mondal", class: "NEET B" },
+          { reg: "53001", name: "Ammar ajmal hakim", class: "NEET B" },
+        ],
+        503: [
+          { reg: "16366", name: "Sohel Rana", class: "NEET B" },
+          { reg: "18467", name: "Md Shakil Bandar", class: "NEET B" },
+          { reg: "36404", name: "Toufik Iqbal", class: "NEET B" },
+          { reg: "47102", name: "Md Arman Ahamed", class: "NEET A" },
+          { reg: "47286", name: "Md Roman Ahamed", class: "NEET B" },
+          { reg: "48262", name: "Manowar Hossain", class: "NEET B" },
+          { reg: "52599", name: "Abu Talha", class: "NEET B" },
+          { reg: "72071", name: "Sk Asif Rahaman", class: "NEET B" },
+        ],
+        504: [
+          { reg: "28271", name: "Md Najrul Islam Bulbul", class: "NEET B" },
+          { reg: "30587", name: "Sahin Aktar", class: "NEET B" },
+          { reg: "52315", name: "Suraj Alam", class: "NEET B" },
+          { reg: "65168", name: "Mirja Najmus Sahadat", class: "NEET B" },
+          { reg: "72166", name: "Sajid Uddin Laskar", class: "NEET B" },
+        ],
+        505: [
+          { reg: "19922", name: "Md Jahir Islam", class: "NEET B" },
+          { reg: "35523", name: "Nabedul Hasan Rana", class: "NEET B" },
+          { reg: "42089", name: "Jahid Hasan", class: "NEET B" },
+          { reg: "59095", name: "Wasim Aktar", class: "NEET B" },
+          { reg: "65450", name: "Ejajul Ahammed", class: "NEET B" },
+          { reg: "72150", name: "Tanbir Alam", class: "NEET B" },
+          { reg: "72192", name: "Sekh Prateek Hossain", class: "NEET B" },
+          { reg: "72252", name: "NAHID BISWAS", class: "NEET B" },
+        ],
+        601: [
+          { reg: "23546", name: "Iftikar Rahaman", class: "NEET B" },
+          { reg: "23559", name: "Farhan Hossain", class: "NEET B" },
+          { reg: "26955", name: "S M Meheraj", class: "NEET B" },
+          { reg: "27023", name: "Mujahid Rahaman Molla", class: "NEET B" },
+          { reg: "27347", name: "Zubair Alam", class: "NEET B" },
+          { reg: "32820", name: "Md Imtiaz Ahamed", class: "NEET B" },
+          { reg: "35021", name: "Md Iyafes Ahmed Molla", class: "NEET B" },
+          { reg: "51935", name: "Md Arifuddin Sk", class: "NEET B" },
+          { reg: "52117", name: "Md Jakiul Hossain", class: "NEET B" },
+          { reg: "52215", name: "Md Minhaj", class: "NEET B" },
+          { reg: "65088", name: "Sk Ashraful Alam", class: "NEET B" },
+          { reg: "72088", name: "Mehebub Alam", class: "NEET B" },
+          { reg: "72134", name: "Raunaq Sheikh", class: "NEET B" },
+          { reg: "72136", name: "Yeasir Rahaman", class: "NEET B" },
+        ],
+        602: [
+          { reg: "27473", name: "Maruf Shihab", class: "NEET B" },
+          { reg: "30920", name: "Naim Aktar", class: "NEET B" },
+          { reg: "36325", name: "Mobarak Hussain", class: "NEET B" },
+          { reg: "42130", name: "Hasanujjaman", class: "NEET B" },
+          { reg: "42132", name: "Armaan Dafadar", class: "NEET B" },
+          { reg: "47982", name: "Shekh Tanij", class: "NEET B" },
+          { reg: "53227", name: "Iftikar Alom", class: "NEET B" },
+          { reg: "65067", name: "Shah Kabir Mallick", class: "NEET B" },
+          { reg: "72154", name: "Mustaque Ahmed", class: "NEET B" },
+          { reg: "72229", name: "Sk Samiul Islam", class: "NEET B" },
+        ],
+        603: [
+          { reg: "19537", name: "Parvej Akhtar", class: "NEET B" },
+          { reg: "22641", name: "Oyayesh Mirza", class: "NEET B" },
+          { reg: "31690", name: "Akm Hasanujjaman", class: "NEET B" },
+          { reg: "32540", name: "Md Masadul Hasan", class: "NEET B" },
+          { reg: "51630", name: "Alamgir Alam", class: "NEET B" },
+          { reg: "59186", name: "Soheb Aktar", class: "NEET B" },
+          { reg: "59440", name: "Kamar Uz Zaman Molla", class: "NEET B" },
+          { reg: "59446", name: "Arif Nawaz Islam", class: "NEET B" },
+          { reg: "65293", name: "Abdul Al Mamun", class: "NEET B" },
+        ],
+        604: [
+          { reg: "35636", name: "Md Salihin Sk", class: "NEET B" },
+          { reg: "47467", name: "Saikat Shaikh", class: "NEET B" },
+          { reg: "47805", name: "Wasikul Sk", class: "NEET B" },
+          { reg: "48209", name: "Intekhab Alam", class: "NEET B" },
+          { reg: "52233", name: "Abir Biswas", class: "NEET B" },
+          { reg: "52851", name: "Mahammed Aiuab", class: "NEET B" },
+        ],
+      };
+
+      let currentRoomIndex = 0;
+      let attendance = {};
+      let allRooms = Object.keys(studentsData); // All rooms available
+      let floorRooms = []; // Rooms specific to the selected floor
+      let highlightedStudent = null;
+      let staffName = "";
+      let selectedFloor = "";
+
+      const floorRoomMapping = {
+        1: ["101", "102", "103", "104", "105"],
+        2: ["201", "202", "203", "204", "205"],
+        3: ["301", "302", "304", "305"], // Room 303 is missing in data
+        4: ["401", "402", "403", "404"],
+        5: ["501", "502", "503", "504", "505"],
+        6: ["601", "602", "603", "604"],
+      };
+
+      // --- Login Screen Functions ---
+      function startAttendance() {
+        staffName = document.getElementById("staffNameInput").value.trim();
+        selectedFloor = document.getElementById("floorSelect").value;
+
+        if (!staffName) {
+          alert("অনুগ্রহ করে আপনার নাম লিখুন।");
+          return;
+        }
+        if (!selectedFloor) {
+          alert("অনুগ্রহ করে একটি ফ্লোর নির্বাচন করুন।");
+          return;
+        }
+
+        floorRooms = floorRoomMapping[selectedFloor].filter((room) =>
+          allRooms.includes(room)
+        );
+
+        if (floorRooms.length === 0) {
+          alert("এই ফ্লোরের জন্য কোনো রুম ডেটা পাওয়া যায়নি।");
+          return;
+        }
+
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("attendanceSystem").classList.remove("hidden");
+        initAttendanceSystem();
+      }
+
+      // Initialize attendance - everyone starts as present
+      function initializeAttendance() {
+        floorRooms.forEach((room) => {
+          studentsData[room].forEach((student) => {
+            if (attendance[student.reg] === undefined) {
+              attendance[student.reg] = "present";
+            }
+          });
+        });
+      }
+
+      // Initialize date selectors (now displays current date only)
+      function initializeDateSelectors() {
+        const daySelect = document.getElementById("daySelect");
+        const monthSelect = document.getElementById("monthSelect");
+        const yearSelect = document.getElementById("yearSelect");
+
+        const today = new Date();
+        const options = { day: "2-digit", month: "long", year: "numeric" };
+        const formattedDate = today.toLocaleDateString("en-US", options);
+
+        daySelect.innerHTML = `<option value="${today.getDate()}">${today.getDate()}</option>`;
+        monthSelect.innerHTML = `<option value="${
+          today.getMonth() + 1
+        }">${today.toLocaleString("en-US", { month: "long" })}</option>`;
+        yearSelect.innerHTML = `<option value="${today.getFullYear()}">${today.getFullYear()}</option>`;
+      }
+
+      // Initialize room buttons for the selected floor
+      function initializeRoomButtons() {
+        const roomButtonsContainer = document.getElementById("roomButtons");
+        roomButtonsContainer.innerHTML = ""; // Clear previous buttons
+        floorRooms.forEach((room, index) => {
+          const button = document.createElement("button");
+          button.className = "room-btn";
+          button.textContent = `Room ${room} (${studentsData[room].length})`;
+          button.onclick = () => switchToRoom(index);
+          roomButtonsContainer.appendChild(button);
+        });
+      }
+
+      // Search students across all rooms of the selected floor
+      function searchStudents() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const searchResults = document.getElementById("searchResults");
+
+        if (searchTerm.length < 2) {
+          searchResults.innerHTML = "";
+          return;
+        }
+
+        const results = [];
+        floorRooms.forEach((room) => {
+          studentsData[room].forEach((student) => {
+            if (
+              student.name.toLowerCase().includes(searchTerm) ||
+              student.reg.toLowerCase().includes(searchTerm)
+            ) {
+              results.push({ ...student, room });
+            }
+          });
+        });
+
+        searchResults.innerHTML = "";
+        results.forEach((student) => {
+          const resultItem = document.createElement("div");
+          resultItem.className = "search-result-item";
+          resultItem.innerHTML = `
+            <div class="search-result-name">${student.name}</div>
+            <div class="search-result-details">Reg: ${student.reg} | Room: ${student.room} | Class: ${student.class}</div>
+          `;
+          resultItem.onclick = () => selectStudent(student);
+          searchResults.appendChild(resultItem);
+        });
+      }
+
+      // Select student from search
+      function selectStudent(student) {
+        // Find the room index within the floorRooms array
+        const roomIndex = floorRooms.indexOf(student.room);
+        if (roomIndex !== -1) {
+          switchToRoom(roomIndex);
+          highlightedStudent = student.reg;
+          document.getElementById("searchInput").value = "";
+          document.getElementById("searchResults").innerHTML = "";
+          setTimeout(() => {
+            highlightedStudent = null;
+            updateRoomDisplay();
+          }, 2000);
+        }
+      }
+
+      // Switch to specific room
+      function switchToRoom(index) {
+        currentRoomIndex = index;
+        updateRoomDisplay();
+        updateNavigationButtons();
+        updateRoomButtons();
+      }
+
+      // Navigate between rooms
+      function navigateRoom(direction) {
+        const newIndex = currentRoomIndex + direction;
+        if (newIndex >= 0 && newIndex < floorRooms.length) {
+          switchToRoom(newIndex);
+        }
+      }
+
+      // Update room display
+      function updateRoomDisplay() {
+        const currentRoom = floorRooms[currentRoomIndex];
+        const students = studentsData[currentRoom];
+
+        document.getElementById(
+          "roomTitle"
+        ).textContent = `Room ${currentRoom} - ${students[0].class}`;
+
+        const studentListContainer = document.getElementById("studentList");
+        studentListContainer.innerHTML = "";
+
+        students.forEach((student) => {
+          const studentCard = document.createElement("div");
+          const attendanceStatus = attendance[student.reg] || "present";
+
+          studentCard.className = `student-card ${attendanceStatus}`;
+          if (highlightedStudent === student.reg) {
+            studentCard.classList.add("highlighted");
+          }
+
+          studentCard.innerHTML = `
+            <div class="student-info">
+              <div>
+                <div class="student-name">${student.name}</div>
+                <div class="student-reg">Reg: ${student.reg}</div>
+              </div>
+              <div class="attendance-status">
+                <div class="status-indicator ${
+                  attendanceStatus === "present"
+                    ? "status-present"
+                    : "status-absent"
+                }">
+                  ${attendanceStatus === "present" ? "✓ হাজির" : "✗ অনুপস্থিত"}
+                </div>
+                <button class="toggle-btn ${
+                  attendanceStatus === "present"
+                    ? "toggle-absent"
+                    : "toggle-present"
+                }"
+                        onclick="toggleAttendance('${student.reg}')">
+                  ${
+                    attendanceStatus === "present"
+                      ? "অনুপস্থিত করুন"
+                      : "হাজির করুন"
+                  }
+                </button>
+              </div>
+            </div>
+          `;
+
+          studentListContainer.appendChild(studentCard);
+        });
+
+        updateStats();
+      }
+
+      // Toggle attendance
+      function toggleAttendance(regNumber) {
+        const currentStatus = attendance[regNumber] || "present";
+        attendance[regNumber] =
+          currentStatus === "present" ? "absent" : "present";
+        updateRoomDisplay();
+        updateProgress();
+      }
+
+      // Mark all present for the current room
+      function markAllPresent() {
+        const currentRoom = floorRooms[currentRoomIndex];
+        studentsData[currentRoom].forEach((student) => {
+          attendance[student.reg] = "present";
+        });
+        updateRoomDisplay();
+        updateProgress();
+      }
+
+      // Update navigation buttons
+      function updateNavigationButtons() {
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        prevBtn.disabled = currentRoomIndex === 0;
+        nextBtn.disabled = currentRoomIndex === floorRooms.length - 1;
+      }
+
+      // Update room buttons
+      function updateRoomButtons() {
+        const roomButtons = document.querySelectorAll(".room-btn");
+        roomButtons.forEach((button, index) => {
+          button.classList.toggle("active", index === currentRoomIndex);
+        });
+      }
+
+      // Update stats for the current room
+      function updateStats() {
+        const currentRoom = floorRooms[currentRoomIndex];
+        const students = studentsData[currentRoom];
+
+        let presentCount = 0;
+        let absentCount = 0;
+
+        students.forEach((student) => {
+          if (attendance[student.reg] === "present") {
+            presentCount++;
+          } else {
+            absentCount++;
+          }
+        });
+
+        document.getElementById("presentCount").textContent = presentCount;
+        document.getElementById("absentCount").textContent = absentCount;
+        document.getElementById("totalCount").textContent = students.length;
+      }
+
+      // Update overall progress for the selected floor
+      function updateProgress() {
+        let totalStudents = 0;
+        let presentStudents = 0;
+
+        floorRooms.forEach((room) => {
+          studentsData[room].forEach((student) => {
+            totalStudents++;
+            if (attendance[student.reg] === "present") {
+              presentStudents++;
+            }
+          });
+        });
+
+        const progressPercentage =
+          totalStudents > 0 ? (presentStudents / totalStudents) * 100 : 0;
+
+        document.getElementById("progressBar").style.width =
+          progressPercentage + "%";
+        document.getElementById(
+          "progressText"
+        ).textContent = `${presentStudents} জন হাজির, ${
+          totalStudents - presentStudents
+        } জন অনুপস্থিত (${Math.round(progressPercentage)}% হাজির)`;
+      }
+
+      // Submit attendance to Google Sheet and Telegram
+      async function submitAttendance() {
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "জমা হচ্ছে...";
+
+        const today = new Date();
+        const dateString = `${today.getDate().toString().padStart(2, "0")}-${(
+          today.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}-${today.getFullYear()}`;
+
+        const attendanceData = [];
+        const absentStudents = [];
+
+        floorRooms.forEach((room) => {
+          studentsData[room].forEach((student) => {
+            const status = attendance[student.reg] || "present";
+            attendanceData.push({
+              room: room,
+              reg: student.reg,
+              name: student.name,
+              class: student.class,
+              status: status,
+            });
+            if (status === "absent") {
+              absentStudents.push(`${student.reg} - ${student.name}`);
+            }
+          });
+        });
+
+        const payload = {
+          staffName: staffName,
+          floor: selectedFloor,
+          date: dateString,
+          attendance: attendanceData,
+          absentStudents: absentStudents,
+        };
+
+        try {
+          const response = await fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+            mode: "no-cors", // Required for Google Apps Script POST requests
+          });
+
+          // Since 'no-cors' mode is used, response.ok will always be false.
+          // We rely on the Apps Script to handle the request and return success/failure.
+          // For a more robust solution, consider using 'cors' mode and handling preflight requests
+          // or using Google's client libraries. For this simple setup, we assume success.
+
+          alert("অ্যাটেনডেন্স সফলভাবে জমা হয়েছে!");
+
+          setTimeout(() => {
+            // attendance screen লুকিয়ে login screen দেখানো হচ্ছে
+            document.getElementById("attendanceSystem").classList.add("hidden");
+            document.getElementById("loginScreen").classList.remove("hidden");
+
+            // input ফিল্ড গুলো reset করা হচ্ছে
+            document.getElementById("staffNameInput").value = "";
+            document.getElementById("floorSelect").value = "";
+
+            // reset global variables
+            attendance = {};
+            currentRoomIndex = 0;
+            highlightedStudent = null;
+            updateProgress();
+          }, 1500); // ১.৫ সেকেন্ড পরে redirect হবে
+        } catch (error) {
+          console.error("Error submitting attendance:", error);
+          alert(
+            "অ্যাটেনডেন্স জমা দিতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"
+          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "✅ অ্যাটেনডেন্স জমা দিন";
+        }
+      }
+
+      // Initialize the attendance system after login
+      function initAttendanceSystem() {
+        initializeDateSelectors();
+        initializeRoomButtons();
+        initializeAttendance();
+        switchToRoom(0); // Display the first room of the selected floor
+        updateProgress();
+      }
+
+      // Initial setup (only login screen visible)
+      document.addEventListener("DOMContentLoaded", () => {
+        // No need to call init() here, it will be called after login
+      });
+    </script>
+  </body>
+</html>
