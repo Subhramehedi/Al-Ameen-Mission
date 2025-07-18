@@ -180,7 +180,7 @@
       .logo-animation-container {
         /* This container will hide the overflow and apply the animation */
         overflow: hidden; /* Crucial for the slide-up effect */
-        height: 80px; /* বাড়ানো হল */
+        height: 80px; /* বাড়ানো হল */
         margin-bottom: 10px; /* Match the height of your .logo */
         margin: 0 auto 10px; /* Inherit margin from .logo */
         display: flex; /* To center the logo within it */
@@ -813,7 +813,7 @@
           <option value="3">ফ্লোর 3 (Room 301-305)</option>
           <option value="4">ফ্লোর 4 (Room 401-404)</option>
           <option value="5">ফ্লোর 5 (Room 501-505)</option>
-          <option value="6">ফ্লোর 6 (Room 601-605)</option>
+          <option value="6">ফ্লোর 6 (Room 601-604)</option>
         </select>
         <!-- Added blast-effect class -->
         <button class="blast-effect" onclick="startAttendance()">
@@ -969,29 +969,377 @@
 
       // Google Apps Script Web App URL (Replace with your deployed URL)
       const WEB_APP_URL =
-        "https://script.google.com/macros/s/AKfycbzV0gM3OPP9JfiB1m2xWyN1V6jkinGifkJpr8d3gMm5o2G86aA87vRxsh0pmLUSN7aUtw/exec"; // REPLACE WITH YOUR DEPLOYED WEB APP URL
+        "https://script.google.com/macros/s/AKfycbyNDL6b7cjE3LPRHOqvbj6SqiGJTswkBo3kRmadJKiqmvh2Y8efEaJCE1sMkZqeZhHkwA/exec"; // REPLACE WITH YOUR DEPLOYED WEB APP URL
 
-      // This will now be populated dynamically
-      let studentsData = {};
+      const studentsData = {
+        101: [
+          { reg: "36196", name: "MD AAWESH RAZA", class: "XI" },
+          { reg: "41061", name: "NAJMUS SADAT", class: "XI" },
+          { reg: "41451", name: "MD AZIZ HOSSAIN", class: "XI" },
+          { reg: "45332", name: "ARMAN ISLAM", class: "XI" },
+          { reg: "49133", name: "FAISAL PARVEG ANSARI", class: "XI" },
+          { reg: "70776", name: "SOHAN TARAFDAR", class: "XI" },
+          { reg: "70781", name: "ARIF MONDAL", class: "XI" },
+          { reg: "70782", name: "ABU RAIHAN", class: "XI" },
+          { reg: "70786", name: "OWAKIL AHAMED", class: "XI" },
+          { reg: "70790", name: "IMRAN RAHAMAN", class: "XI" },
+          { reg: "70983", name: "NAWAZ MONDAL", class: "XI" },
+          { reg: "71003", name: "MANJUR ALAM", class: "XI" },
+          { reg: "71062", name: "MD HAYATULLA", class: "XI" },
+        ],
+        102: [
+          { reg: "35611", name: "SOHAIL RANA SARDAR", class: "XI" },
+          { reg: "41354", name: "RAJJAB ALI", class: "XI" },
+          { reg: "49614", name: "ISHAD HASSAN", class: "XI" },
+          { reg: "54514", name: "RUMAN SANI", class: "XI" },
+          { reg: "54800", name: "AHMAD", class: "XI" },
+          { reg: "56378", name: "SAKIL AKHTAR", class: "XI" },
+          { reg: "70785", name: "ASRAFUL MIRZA", class: "XI" },
+          { reg: "70808", name: "ATIF UDDIN MONDAL", class: "XI" },
+          { reg: "70840", name: "SHAMIM MONDAL", class: "XI" },
+          { reg: "70952", name: "TAHIR AZIZ", class: "XI" },
+          { reg: "71925", name: "ROHIT HOQUE", class: "XI" },
+        ],
+        103: [
+          { reg: "36553", name: "LABIB RAHAMAN", class: "XI" },
+          { reg: "41767", name: "NUR ALAM", class: "XI" },
+          { reg: "54535", name: "MD RAHMAN HOSSAIN", class: "XI" },
+          { reg: "54709", name: "SAYAN SARDAR", class: "XI" },
+          { reg: "55192", name: "ISHAYAT HASAN", class: "XI" },
+          { reg: "70868", name: "ASIM AKTAR", class: "XI" },
+          { reg: "70886", name: "MD MINHAZUDDIN GOLDER", class: "XI" },
+        ],
+        104: [
+          { reg: "41034", name: "SK MD ASHIF", class: "XI" },
+          { reg: "41037", name: "SK NAZIB UR RAHAMAN", class: "XI" },
+          { reg: "41202", name: "ENAMUL KABIR", class: "XI" },
+          { reg: "45091", name: "MD AKRAM", class: "XI" },
+          { reg: "49216", name: "TANBIR SK", class: "XI" },
+          { reg: "49355", name: "ZAHIN ANAN", class: "XI" },
+          { reg: "49916", name: "MD TOWQIR REZA", class: "XI" },
+          { reg: "49966", name: "AARIYAN SHEIK", class: "XI" },
+          { reg: "54636", name: "TASHMIA MOTIUR RAHAMAN", class: "XI" },
+          { reg: "70862", name: "SK JISHAN UDDIN", class: "XI" },
+          { reg: "71566", name: "DILUYAR HOSSAIN ANSARI", class: "XI" },
+        ],
+        105: [
+          { reg: "36445", name: "SK NABIDUL HASAN RAJ", class: "XI" },
+          { reg: "46130", name: "FAHIM AL ROSE", class: "XI" },
+          { reg: "49659", name: "HAMID RAJA", class: "XI" },
+          { reg: "54572", name: "NAFEES ALAM MONDAL", class: "XI" },
+          { reg: "70778", name: "TAFHIM TAMAM", class: "XI" },
+          { reg: "70784", name: "NAJME ALAM", class: "XI" },
+          { reg: "70882", name: "MD KASED MONDAL", class: "XI" },
+          { reg: "70937", name: "SAHARUL ISLAM", class: "XI" },
+          { reg: "71053", name: "IJAJ AHAMMED MONDAL", class: "XI" },
+          { reg: "71193", name: "MD HASIM AKTAR", class: "XI" },
+        ],
+        201: [
+          { reg: "35143", name: "MIYARAJ MOLLA", class: "XI" },
+          { reg: "35567", name: "SAYEL HOSSAIN", class: "XI" },
+          { reg: "36073", name: "MD SOHEL ISLAM", class: "XI" },
+          { reg: "41421", name: "ARIYAN AHAMED", class: "XI" },
+          { reg: "49552", name: "TANZIM ISLAM", class: "XI" },
+          { reg: "49870", name: "SAMIM AKTHER", class: "XI" },
+          { reg: "49888", name: "SK ABABIL HOQUE", class: "XI" },
+          { reg: "54527", name: "SAHIN ALAM", class: "XI" },
+          { reg: "54892", name: "MOHAMMAD ANAS SIDDIQUE", class: "XI" },
+          { reg: "55056", name: "MINHAJ MONDAL", class: "XI" },
+          { reg: "55633", name: "BABU NASIM REJA", class: "XI" },
+          { reg: "55650", name: "MISBAUL HAQUE", class: "XI" },
+          { reg: "70779", name: "NAYEM REJA MONDAL", class: "XI" },
+          { reg: "70780", name: "RIYAJ UDDIN DARJEE", class: "XI" },
+          { reg: "70800", name: "AQEEL ABRAR", class: "XI" },
+          { reg: "70819", name: "AL MASUM LASKAR", class: "XI" },
+          { reg: "70933", name: "MD KHURSHID ALAM", class: "XI" },
+          { reg: "71088", name: "HABIBUR SK", class: "XI" },
+        ],
+        202: [
+          { reg: "35542", name: "MASUM ALI", class: "XI" },
+          { reg: "36359", name: "MD ARIJ AFTAB", class: "XI" },
+          { reg: "41156", name: "MD ABDUL SANARUL SK", class: "XI" },
+          { reg: "45648", name: "ASHIK EKBAL", class: "XI" },
+          { reg: "49518", name: "SAKIB REJA", class: "XI" },
+          { reg: "50221", name: "DILDAR SHEIKH", class: "XI" },
+          { reg: "50978", name: "SABIR ALAM", class: "XI" },
+          { reg: "51602", name: "TUHIN HOSSAIN SHAIKH", class: "XI" },
+          { reg: "54365", name: "TANVIR IQBAL", class: "XI" },
+          { reg: "54468", name: "MD ABUL KALAM AZAD", class: "XI" },
+          { reg: "55188", name: "MD KAMRAN KHAN", class: "XI" },
+          { reg: "70789", name: "MIR MISBAHUL HOQUE", class: "XI" },
+          { reg: "71040", name: "SUHAN SARDAR", class: "XI" },
+        ],
+        203: [
+          { reg: "36253", name: "SAIFUL ISLAM", class: "XI" },
+          { reg: "36937", name: "MD SAKHAWAT HOSSAIN", class: "XI" },
+          { reg: "46276", name: "AKSAR AMANAT ALI", class: "XI" },
+          { reg: "48991", name: "MD MIMHAZ HOSSAIN", class: "XI" },
+          { reg: "49178", name: "SIYAM FERDOUS", class: "XI" },
+          { reg: "49247", name: "NIZAM UDDIN SHEIKH", class: "XI" },
+          { reg: "54658", name: "SAKIB HOSSAIN", class: "XI" },
+          { reg: "70787", name: "SHAYAR BAIDYA", class: "XI" },
+          { reg: "70816", name: "FAHMID KALAM", class: "XI" },
+          { reg: "70926", name: "ALFARHAD SHEIKH", class: "XI" },
+        ],
+        204: [
+          { reg: "35407", name: "RASEL SK", class: "XI" },
+          { reg: "36254", name: "ARIYAN SK", class: "XI" },
+          { reg: "41177", name: "MD RIHAN SAJJAD SK", class: "XI" },
+          { reg: "44722", name: "MOHAMMAD REJA", class: "XI" },
+          { reg: "45251", name: "SK MAHATAB ALAM", class: "XI" },
+          { reg: "45437", name: "RIYAJ ALAM", class: "XI" },
+          { reg: "49280", name: "MAHAFUJ RAHAMAN", class: "XI" },
+          { reg: "49955", name: "MD ROHIT SEIKH", class: "XI" },
+          { reg: "50102", name: "ASHIF MISTRY", class: "XI" },
+          { reg: "51140", name: "MIR WAZUDDIN", class: "XI" },
+          { reg: "54935", name: "SK MOINUL ISLAM", class: "XI" },
+          { reg: "56934", name: "MD BULBUL HASAN", class: "XI" },
+          { reg: "57878", name: "HASIBUR RAHAMAN", class: "XI" },
+        ],
+        205: [
+          { reg: "34911", name: "ABU HASNATH LASKAR", class: "XI" },
+          { reg: "35777", name: "ABDUL NAYEEM", class: "XI" },
+          { reg: "36354", name: "MD SAIRUL ALAM", class: "XI" },
+          { reg: "41200", name: "MD RABIUL ALAM", class: "XI" },
+          { reg: "44728", name: "MD AFIF SARKAR", class: "XI" },
+          { reg: "45477", name: "SK SAMIRUDDIN", class: "XI" },
+          { reg: "45486", name: "IMRAN NAJIR", class: "XI" },
+          { reg: "49703", name: "ASFAQUR RAHAMAN", class: "XI" },
+          { reg: "54780", name: "RAIYAN MONDAL", class: "XI" },
+          { reg: "70863", name: "A R WASIM AKTER", class: "XI" },
+          { reg: "70925", name: "SORIFUL MONDAL", class: "XI" },
+          { reg: "70965", name: "SAHEN RAHAMAN", class: "XI" },
+          { reg: "70972", name: "AL MAMUN SHAIKH", class: "XI" },
+        ],
+        301: [
+          { reg: "30950", name: "WASIM BISWAS", class: "XII" },
+          { reg: "31514", name: "MD RAJIBUL HOSSAIN", class: "XII" },
+          { reg: "31773", name: "SAHIL SK", class: "XII" },
+          { reg: "36362", name: "MD AAKIQUE", class: "XII" },
+          { reg: "36954", name: "SK JAMIRUDDIN", class: "XII" },
+          { reg: "41802", name: "KASHIF IMRAN HOSSAIN", class: "XII" },
+          { reg: "44237", name: "WASIQUR RAHAMAN", class: "XII" },
+          { reg: "44483", name: "IBRAHIM SK", class: "XII" },
+          { reg: "44674", name: "TANMOY MALLICK", class: "XII" },
+          { reg: "44824", name: "SOUKAT JAHID", class: "XII" },
+          { reg: "45106", name: "AMINUL KABIR", class: "XII" },
+          { reg: "50181", name: "MD SAKIL AHMED ANSARI", class: "XII" },
+          { reg: "63902", name: "ATIK SHIHAB MIDDEY", class: "XII" },
+          { reg: "64121", name: "AMIRUL ALAM", class: "XII" },
+          { reg: "64344", name: "SK TOUFIK UDDIN", class: "XII" },
+        ],
+        302: [
+          { reg: "30872", name: "KAZI MUSAD ALAM", class: "XII" },
+          { reg: "31429", name: "MD IKBAL KARIM", class: "XII" },
+          { reg: "35669", name: "MOBARAK KHAN", class: "XII" },
+          { reg: "36902", name: "HABIBUR RAHAMAN", class: "XII" },
+          { reg: "44368", name: "SK AMAN RAJ", class: "XII" },
+          { reg: "44580", name: "MD ASIF", class: "XII" },
+          { reg: "49208", name: "PARVEJ MALLICK", class: "XII" },
+          { reg: "49648", name: "MD FARHAT HOSSAIN", class: "XII" },
+          { reg: "63873", name: "ADIL SANFUI", class: "XII" },
+          { reg: "63882", name: "SAYAN RAHAMAN", class: "XII" },
+          { reg: "63921", name: "MD WAJAHAT ALI", class: "XII" },
+        ],
+        304: [
+          { reg: "31179", name: "BELAL HOSEN KHAN", class: "XII" },
+          { reg: "31714", name: "IMRAN HOSSAIN", class: "XII" },
+          { reg: "31761", name: "AJWAD AS SABUR", class: "XII" },
+          { reg: "39688", name: "RAIHAN AHAMED", class: "XII" },
+          { reg: "39804", name: "ABTAB HOSSAIN", class: "XII" },
+          { reg: "40457", name: "FARHAN RAHAMAN", class: "XII" },
+          { reg: "49557", name: "ROBIUL ISLAM", class: "XII" },
+          { reg: "63878", name: "ABDUL WAHID MONDAL", class: "XII" },
+          { reg: "63885", name: "JISANUR ISLAM", class: "XII" },
+          { reg: "63901", name: "RUBEL MIAH", class: "XII" },
+          { reg: "63956", name: "MD ISHTIAQUE KHAN", class: "XII" },
+          { reg: "64037", name: "MD ABDULLAH AHSAN LASKAR", class: "XII" },
+        ],
+        305: [
+          { reg: "30893", name: "SAKIL SK", class: "XII" },
+          { reg: "32018", name: "SARFARAJ SK", class: "XII" },
+          { reg: "32586", name: "NIJAMUDDIN AHAMED", class: "XII" },
+          { reg: "32609", name: "MD ALAUDDIN SK", class: "XII" },
+          { reg: "36537", name: "SAMIUL RAHAMAN", class: "XII" },
+          { reg: "44457", name: "MD SHAHIDULLA", class: "XII" },
+          { reg: "45212", name: "TAHIDUL ISLAM", class: "XII" },
+          { reg: "49563", name: "KISMATULLAH", class: "XII" },
+          { reg: "49719", name: "SWAPNIL KHAN", class: "XII" },
+          { reg: "49729", name: "RAHAT SARKAR", class: "XII" },
+          { reg: "63890", name: "ANISH ALAM", class: "XII" },
+          { reg: "63891", name: "AFRIDI SK", class: "XII" },
+          { reg: "64155", name: "MD MIZANUR RAHMAN", class: "XII" },
+        ],
+        401: [
+          { reg: "26381", name: "RAHIK HASSAN MONDAL", class: "NEET A" },
+          { reg: "27243", name: "MD PARVAGE MOSARAF", class: "NEET A" },
+          { reg: "30499", name: "MIRJA RAJ", class: "NEET A" },
+          { reg: "35378", name: "SAYAN SK", class: "NEET A" },
+          { reg: "36308", name: "ASHADUL SK", class: "NEET A" },
+          { reg: "36812", name: "LIMAN AKTAR", class: "NEET A" },
+          { reg: "39886", name: "SK RAJIBUL HOSSAIN", class: "NEET A" },
+          { reg: "40046", name: "MD IBRAHIM MUNSI", class: "NEET A" },
+          { reg: "40167", name: "HABIBUR RAHAMAN MIAH", class: "NEET A" },
+          { reg: "44754", name: "MOJAHIDUL ISLAM", class: "NEET A" },
+          { reg: "45006", name: "TALHA HALDER", class: "NEET A" },
+          { reg: "47015", name: "Md Wasim Sk", class: "NEET A" },
+          { reg: "47191", name: "REHAN LASKAR", class: "NEET A" },
+          { reg: "47248", name: "MUNSHI TOUKIR JIYA", class: "NEET A" },
+          { reg: "58290", name: "REJOYAN ALAM", class: "NEET A" },
+          { reg: "58419", name: "REHAN AKTAR", class: "NEET A" },
+          { reg: "72112", name: "Najmul Hossen Chaprashi", class: "NEET A" },
+        ],
+        402: [
+          { reg: "28286", name: "NABID UL FAHAD", class: "NEET A" },
+          { reg: "28333", name: "MOHAIMENUL ISLAM", class: "NEET A" },
+          { reg: "35978", name: "SK SANWAZZ HOSSAIN MONDAL", class: "NEET A" },
+          { reg: "36338", name: "MD RIYAMIN ALI", class: "NEET A" },
+          { reg: "39774", name: "RAIYAN HOQUE", class: "NEET A" },
+          { reg: "41564", name: "MD ZUBAYER", class: "NEET A" },
+          { reg: "45269", name: "ROUSAN TANVIR ISLAM", class: "NEET A" },
+          { reg: "58045", name: "MD SAHIN AKTAR", class: "NEET A" },
+          { reg: "58265", name: "RIHAB ARSALAN", class: "NEET A" },
+          { reg: "72102", name: "SK IMTIYAZ HOSEN", class: "NEET A" },
+          { reg: "72116", name: "Tanveer Rahaman Biswas", class: "NEET A" },
+          { reg: "72144", name: "Sk Md Nasim Aktar", class: "NEET A" },
+        ],
+        403: [
+          { reg: "27120", name: "MISBAHUR RAHAMAN MOLLAH", class: "NEET A" },
+          { reg: "35512", name: "Labib Muaz Abidin", class: "NEET A" },
+          { reg: "35681", name: "IMDADUL ISLAM", class: "NEET A" },
+          { reg: "37081", name: "MD ARIF HOSSAIN", class: "NEET A" },
+          { reg: "58003", name: "MD ARBAZ HOSSAIN", class: "NEET A" },
+          { reg: "58015", name: "SAFIKUL ALAM", class: "NEET A" },
+          { reg: "58087", name: "KIFAYAT CHOWDHURY", class: "NEET A" },
+          { reg: "58228", name: "MD AFSAN", class: "NEET A" },
+          { reg: "58278", name: "Md Nayel", class: "NEET A" },
+          { reg: "72109", name: "Imran Saikh", class: "NEET A" },
+          { reg: "72124", name: "Seikh Shyfur Rahaman", class: "NEET A" },
+        ],
+        404: [
+          { reg: "26820", name: "SALMAN HOSSAIN", class: "NEET A" },
+          { reg: "28452", name: "ABDUL KAIYUM SHAIKH", class: "NEET A" },
+          { reg: "30856", name: "SIRAJUDDIN SEKH", class: "NEET A" },
+          { reg: "39684", name: "RIYAJUL ISLAM", class: "NEET A" },
+          { reg: "39745", name: "RANA MONDAL", class: "NEET A" },
+          { reg: "40319", name: "ABDUL IDBAR SK", class: "NEET A" },
+          { reg: "44188", name: "KHONDAKAR NUR AMIN", class: "NEET A" },
+          { reg: "44219", name: "GULAM GAWS", class: "NEET A" },
+          { reg: "44539", name: "MD INTEKHAB ALAM", class: "NEET A" },
+          { reg: "58095", name: "SK TEHSIN ALAM", class: "NEET A" },
+          { reg: "58259", name: "SAMIUL AKTAR", class: "NEET A" },
+          { reg: "72083", name: "Riyaj Sk", class: "NEET A" },
+          { reg: "72086", name: "Md Asfak Hossain", class: "NEET A" },
+          { reg: "72235", name: "MOHAMMAD WASIQ", class: "NEET A" },
+        ],
+        501: [
+          { reg: "28430", name: "Ashik Mohammad Molla", class: "NEET B" },
+          { reg: "28753", name: "MD RIYAJUL ISLAM", class: "NEET B" },
+          { reg: "47883", name: "Sk Sahenawaz", class: "NEET B" },
+          { reg: "47884", name: "Golam Masum", class: "NEET B" },
+          { reg: "47958", name: "Sahajad Ali", class: "NEET B" },
+          { reg: "51717", name: "Ashiq Ikbal", class: "NEET B" },
+          { reg: "72167", name: "Reaj Hassan", class: "NEET B" },
+          { reg: "72186", name: "Imtiaz Reza", class: "NEET B" },
+        ],
+        502: [
+          { reg: "18826", name: "Raihan Reza", class: "NEET B" },
+          { reg: "19263", name: "Nasrul Sk", class: "NEET B" },
+          { reg: "22245", name: "Atabur Rahaman", class: "NEET B" },
+          { reg: "31131", name: "Hashir Mondal", class: "NEET B" },
+          { reg: "53001", name: "Ammar ajmal hakim", class: "NEET B" },
+        ],
+        503: [
+          { reg: "16366", name: "Sohel Rana", class: "NEET B" },
+          { reg: "18467", name: "Md Shakil Bandar", class: "NEET B" },
+          { reg: "36404", name: "Toufik Iqbal", class: "NEET B" },
+          { reg: "47102", name: "Md Arman Ahamed", class: "NEET A" },
+          { reg: "47286", name: "Md Roman Ahamed", class: "NEET B" },
+          { reg: "48262", name: "Manowar Hossain", class: "NEET B" },
+          { reg: "52599", name: "Abu Talha", class: "NEET B" },
+          { reg: "72071", name: "Sk Asif Rahaman", class: "NEET B" },
+        ],
+        504: [
+          { reg: "28271", name: "Md Najrul Islam Bulbul", class: "NEET B" },
+          { reg: "30587", name: "Sahin Aktar", class: "NEET B" },
+          { reg: "52315", name: "Suraj Alam", class: "NEET B" },
+          { reg: "65168", name: "Mirja Najmus Sahadat", class: "NEET B" },
+          { reg: "72166", name: "Sajid Uddin Laskar", class: "NEET B" },
+        ],
+        505: [
+          { reg: "19922", name: "Md Jahir Islam", class: "NEET B" },
+          { reg: "35523", name: "Nabedul Hasan Rana", class: "NEET B" },
+          { reg: "42089", name: "Jahid Hasan", class: "NEET B" },
+          { reg: "59095", name: "Wasim Aktar", class: "NEET B" },
+          { reg: "65450", name: "Ejajul Ahammed", class: "NEET B" },
+          { reg: "72150", name: "Tanbir Alam", class: "NEET B" },
+          { reg: "72192", name: "Sekh Prateek Hossain", class: "NEET B" },
+          { reg: "72252", name: "NAHID BISWAS", class: "NEET B" },
+        ],
+        601: [
+          { reg: "23546", name: "Iftikar Rahaman", class: "NEET B" },
+          { reg: "23559", name: "Farhan Hossain", class: "NEET B" },
+          { reg: "26955", name: "S M Meheraj", class: "NEET B" },
+          { reg: "27023", name: "Mujahid Rahaman Molla", class: "NEET B" },
+          { reg: "27347", name: "Zubair Alam", class: "NEET B" },
+          { reg: "32820", name: "Md Imtiaz Ahamed", class: "NEET B" },
+          { reg: "35021", name: "Md Iyafes Ahmed Molla", class: "NEET B" },
+          { reg: "51935", name: "Md Arifuddin Sk", class: "NEET B" },
+          { reg: "52117", name: "Md Jakiul Hossain", class: "NEET B" },
+          { reg: "52215", name: "Md Minhaj", class: "NEET B" },
+          { reg: "65088", name: "Sk Ashraful Alam", class: "NEET B" },
+          { reg: "72088", name: "Mehebub Alam", class: "NEET B" },
+          { reg: "72134", name: "Raunaq Sheikh", class: "NEET B" },
+          { reg: "72136", name: "Yeasir Rahaman", class: "NEET B" },
+        ],
+        602: [
+          { reg: "27473", name: "Maruf Shihab", class: "NEET B" },
+          { reg: "30920", name: "Naim Aktar", class: "NEET B" },
+          { reg: "36325", name: "Mobarak Hussain", class: "NEET B" },
+          { reg: "42130", name: "Hasanujjaman", class: "NEET B" },
+          { reg: "42132", name: "Armaan Dafadar", class: "NEET B" },
+          { reg: "47982", name: "Shekh Tanij", class: "NEET B" },
+          { reg: "53227", name: "Iftikar Alom", class: "NEET B" },
+          { reg: "65067", name: "Shah Kabir Mallick", class: "NEET B" },
+          { reg: "72154", name: "Mustaque Ahmed", class: "NEET B" },
+          { reg: "72229", name: "Sk Samiul Islam", class: "NEET B" },
+        ],
+        603: [
+          { reg: "19537", name: "Parvej Akhtar", class: "NEET B" },
+          { reg: "22641", name: "Oyayesh Mirza", class: "NEET B" },
+          { reg: "31690", name: "Akm Hasanujjaman", class: "NEET B" },
+          { reg: "32540", name: "Md Masadul Hasan", class: "NEET B" },
+          { reg: "51630", name: "Alamgir Alam", class: "NEET B" },
+          { reg: "59186", name: "Soheb Aktar", class: "NEET B" },
+          { reg: "59440", name: "Kamar Uz Zaman Molla", class: "NEET B" },
+          { reg: "59446", name: "Arif Nawaz Islam", class: "NEET B" },
+          { reg: "65293", name: "Abdul Al Mamun", class: "NEET B" },
+        ],
+        604: [
+          { reg: "35636", name: "Md Salihin Sk", class: "NEET B" },
+          { reg: "47467", name: "Saikat Shaikh", class: "NEET B" },
+          { reg: "47805", name: "Wasikul Sk", class: "NEET B" },
+          { reg: "48209", name: "Intekhab Alam", class: "NEET B" },
+          { reg: "52233", name: "Abir Biswas", class: "NEET B" },
+          { reg: "52851", name: "Mahammed Aiuab", class: "NEET B" },
+        ],
+      };
 
       let currentRoomIndex = 0;
       let attendance = {};
-      let allRooms = []; // This will be populated after fetching data
+      let allRooms = Object.keys(studentsData); // All rooms available
       let floorRooms = []; // Rooms specific to the selected floor
       let highlightedStudent = null;
       let staffName = "";
       let selectedFloor = "";
 
-      // The floorRoomMapping is no longer strictly needed if studentsData is dynamic,
-      // but it can be used for the dropdown options.
-      // The actual floorRooms will be derived from the keys of the fetched studentsData.
       const floorRoomMapping = {
         1: ["101", "102", "103", "104", "105"],
         2: ["201", "202", "203", "204", "205"],
         3: ["301", "302", "303", "304", "305"],
-        4: ["401", "402", "403", "404"],
+        4: ["401", "402", "403", "404"], // Corrected to match data
         5: ["501", "502", "503", "504", "505"],
-        6: ["601", "602", "603", "604", "605"],
+        6: ["601", "602", "603", "604"], // Corrected to match data
       };
 
       // --- Login Screen Functions ---
@@ -1006,13 +1354,12 @@
         }
       }
 
-      async function startAttendance() {
+      function startAttendance() {
         const staffId = document.getElementById("staffIdInput").value.trim();
         const staffPassword = document
           .getElementById("staffPasswordInput")
           .value.trim();
         const floor = document.getElementById("floorSelect").value;
-        const loginButton = document.querySelector(".login-box button");
 
         if (!staffId || !staffPassword) {
           alert("অনুগ্রহ করে ID ও Password দিন।");
@@ -1034,63 +1381,27 @@
           return;
         }
 
-        // Show loading overlay
-        const loadingOverlay = document.getElementById("loadingOverlay");
-        loadingOverlay.classList.add("show");
-        loginButton.disabled = true; // Disable button during loading
-
         // Save staff name from credentials
         staffName = staffCredentials[staffId].name;
         selectedFloor = floor;
 
-        try {
-          // Fetch student data for the selected floor
-          const response = await fetch(
-            `${WEB_APP_URL}?action=getStudentsByFloor&floor=${selectedFloor}`
-          );
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
+        // Filter rooms based on the selected floor and available data
+        floorRooms = floorRoomMapping[selectedFloor].filter((room) =>
+          allRooms.includes(room)
+        );
 
-          if (Object.keys(data).length === 0) {
-            alert("এই ফ্লোরের জন্য কোনো শিক্ষার্থীর ডেটা পাওয়া যায়নি।");
-            loadingOverlay.classList.remove("show");
-            loginButton.disabled = false;
-            return;
-          }
-
-          studentsData = data; // Update the global studentsData object
-          floorRooms = Object.keys(studentsData).sort(
-            (a, b) => parseInt(a) - parseInt(b)
-          ); // Get sorted room numbers for the floor
-
-          if (floorRooms.length === 0) {
-            alert("এই ফ্লোরের জন্য কোনো রুম ডেটা পাওয়া যায়নি।");
-            loadingOverlay.classList.remove("show");
-            loginButton.disabled = false;
-            return;
-          }
-
-          document.getElementById("loginScreen").classList.add("hidden");
-          document
-            .getElementById("attendanceSystem")
-            .classList.remove("hidden");
-          initAttendanceSystem();
-        } catch (error) {
-          console.error("Error fetching student data:", error);
-          alert(
-            "শিক্ষার্থীর ডেটা লোড করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"
-          );
-        } finally {
-          loadingOverlay.classList.remove("show");
-          loginButton.disabled = false;
+        if (floorRooms.length === 0) {
+          alert("এই ফ্লোরের জন্য কোনো রুম ডেটা পাওয়া যায়নি।");
+          return;
         }
+
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("attendanceSystem").classList.remove("hidden");
+        initAttendanceSystem();
       }
 
       // Initialize attendance - everyone starts as present
       function initializeAttendance() {
-        attendance = {}; // Reset attendance for new session
         floorRooms.forEach((room) => {
           if (studentsData[room]) {
             // Ensure room data exists
@@ -1224,11 +1535,9 @@
           return;
         }
 
-        // Assuming all students in a room are of the same class, or pick the first one's class
-        const roomClass = students.length > 0 ? students[0].class : "N/A";
         document.getElementById(
           "roomTitle"
-        ).textContent = `Room ${currentRoom} - ${roomClass}`;
+        ).textContent = `Room ${currentRoom} - ${students[0].class}`;
 
         const studentListContainer = document.getElementById("studentList");
         studentListContainer.innerHTML = "";
@@ -1455,7 +1764,6 @@
             staffName = "";
             selectedFloor = "";
             floorRooms = []; // Clear floorRooms
-            studentsData = {}; // Clear fetched student data
             updateProgress(); // Reset progress display
           }, 500); // Shortened this timeout as the overlay hides first
         } catch (error) {
