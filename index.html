@@ -6,6 +6,11 @@
     <title>Al Ameen Mission Academy Nayabaz Attendance Tracker</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Google Fonts - Poppins for a more modern look -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       /* Existing CSS styles remain here */
       .logo {
@@ -42,6 +47,51 @@
         min-width: max-content;
       }
 
+      /* --- NEW: Blast Effect CSS --- */
+      .blast-effect {
+        position: relative;
+        overflow: hidden;
+        z-index: 1; /* Ensure the blast is above other content */
+      }
+
+      .blast-effect::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.8) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+        border-radius: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        transition: none; /* Reset transition for immediate effect */
+        pointer-events: none; /* Allow clicks to pass through */
+        z-index: 2;
+      }
+
+      .blast-effect.active::before {
+        animation: blast 0.4s ease-out forwards;
+      }
+
+      @keyframes blast {
+        0% {
+          width: 0;
+          height: 0;
+          opacity: 0.8;
+        }
+        100% {
+          width: 200%; /* Expand beyond button size */
+          height: 200%;
+          opacity: 0;
+        }
+      }
+      /* --- END NEW: Blast Effect CSS --- */
+
       .nav-btn {
         padding: 10px 20px;
         border: none;
@@ -54,7 +104,7 @@
         transition: all 0.3s ease;
       }
       .nav-btn:hover:not(:disabled) {
-        transform: translateY(-2px);
+        transform: translateY(-3px); /* Enhanced hover */
         background: linear-gradient(135deg, #3282b8 0%, #0f4c75 100%);
         box-shadow: 0 6px 12px rgba(15, 76, 117, 0.4);
       }
@@ -66,7 +116,7 @@
       }
 
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Poppins", sans-serif; /* Updated font */
         background: linear-gradient(
           135deg,
           #0f4c75 0%,
@@ -125,6 +175,42 @@
         box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         border: 3px solid rgba(255, 255, 255, 0.3);
       }
+
+      /* --- NEW: Logo Animation CSS --- */
+      .logo-animation-container {
+        /* This container will hide the overflow and apply the animation */
+        overflow: hidden; /* Crucial for the slide-up effect */
+        height: 80px; /* বাড়ানো হল */
+        margin-bottom: 10px; /* Match the height of your .logo */
+        margin: 0 auto 10px; /* Inherit margin from .logo */
+        display: flex; /* To center the logo within it */
+        align-items: flex-end; /* Start logo at the bottom of the container */
+        justify-content: center;
+      }
+
+      .logo-animation-container .logo {
+        /* Apply animation to the actual logo element */
+        animation: logoSlideUpFadeIn 1s ease-out forwards; /* 1 second duration, smooth ease-out */
+        transform: translateY(
+          100%
+        ); /* Start completely below its final position */
+        opacity: 0; /* Start invisible */
+      }
+
+      @keyframes logoSlideUpFadeIn {
+        0% {
+          transform: translateY(100%); /* Start from below */
+          opacity: 0; /* Start invisible */
+        }
+        60% {
+          opacity: 1; /* Fade in quickly */
+        }
+        100% {
+          transform: translateY(0); /* End at its natural position */
+          opacity: 1; /* Fully visible */
+        }
+      }
+      /* --- END NEW: Logo Animation CSS --- */
 
       .header h1 {
         font-size: 1.3rem;
@@ -284,8 +370,8 @@
       }
 
       .student-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px); /* Enhanced hover */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
       }
 
       .student-card.present {
@@ -510,15 +596,16 @@
 
       .login-box {
         background: white;
-        padding: 30px;
+        padding: 40px;
         border-radius: 20px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         text-align: center;
         width: 100%;
         max-width: 350px;
+        min-height: 550px; /* NEW: এই লাইনটি যোগ করুন বা মান পরিবর্তন করুন */
         position: relative;
         position: absolute;
-        top: 80px;
+        top: 20px;
         left: 50%;
         transform: translateX(-50%);
       }
@@ -537,6 +624,13 @@
         border: 1px solid #e9ecef;
         border-radius: 10px;
         font-size: 16px;
+      }
+
+      .login-box input:focus,
+      .login-box select:focus {
+        outline: none;
+        border-color: #3282b8;
+        box-shadow: 0 0 0 3px rgba(50, 130, 184, 0.2); /* Enhanced focus */
       }
 
       .login-box button {
@@ -589,19 +683,109 @@
           justify-content: space-between;
         }
       }
+
+      /* --- NEW: Loading Overlay CSS (Modified) --- */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(
+          0,
+          0,
+          0,
+          0.85
+        ); /* Slightly darker background for better contrast */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      .loading-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(
+          255,
+          255,
+          255,
+          0.1
+        ); /* Subtle background for the content box */
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .loading-logo-wrapper {
+        position: relative;
+        width: 100px; /* Larger size for the logo in the overlay */
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        /* Initial glow/pulse effect */
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); /* Gold color for glow */
+        animation: pulse 2s infinite; /* Apply pulse animation */
+      }
+
+      .loading-logo {
+        width: 90%; /* Make logo slightly smaller than wrapper to show glow */
+        height: 90%;
+        border-radius: 50%;
+        object-fit: cover; /* Ensure image covers the circle */
+        border: 3px solid rgba(255, 255, 255, 0.5); /* White border for logo */
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); /* Expand and fade out */
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+        }
+      }
+
+      .loading-text {
+        color: white;
+        font-size: 1.5rem; /* Larger text */
+        font-weight: bold;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      }
+      /* --- END NEW: Loading Overlay CSS (Modified) --- */
     </style>
   </head>
   <body>
     <!-- Login Screen -->
     <div id="loginScreen" class="login-container">
       <div class="login-box">
-        <div class="logo">
-          <img
-            src="https://play-lh.googleusercontent.com/gufR1twVlU6_SzC-iIAD_8bLLf-XYVAwwwwJF-cphD32IX0GeHNLi4GrN42hRYDHg-A"
-            alt="Logo"
-            style="width: 100%; height: 100%; border-radius: 50%"
-          />
+        <!-- --- NEW: Logo Animation Container --- -->
+        <div class="logo-animation-container">
+          <div class="logo">
+            <img
+              src="https://play-lh.googleusercontent.com/gufR1twVlU6_SzC-iIAD_8bLLf-XYVAwwwwJF-cphD32IX0GeHNLi4GrN42hRYDHg-A"
+              alt="Logo"
+              style="width: 100%; height: 100%; border-radius: 50%"
+            />
+          </div>
         </div>
+        <!-- --- END NEW: Logo Animation Container --- -->
         <h2>Staff Login</h2>
 
         <input
@@ -631,7 +815,10 @@
           <option value="5">ফ্লোর 5 (Room 501-505)</option>
           <option value="6">ফ্লোর 6 (Room 601-604)</option>
         </select>
-        <button onclick="startAttendance()">শুরু করুন</button>
+        <!-- Added blast-effect class -->
+        <button class="blast-effect" onclick="startAttendance()">
+          শুরু করুন
+        </button>
       </div>
     </div>
 
@@ -678,10 +865,20 @@
         </div>
 
         <div class="navigation">
-          <button class="nav-btn" id="prevBtn" onclick="navigateRoom(-1)">
+          <!-- Added blast-effect class -->
+          <button
+            class="nav-btn blast-effect"
+            id="prevBtn"
+            onclick="navigateRoom(-1)"
+          >
             ← Previous
           </button>
-          <button class="nav-btn" id="nextBtn" onclick="navigateRoom(1)">
+          <!-- Added blast-effect class -->
+          <button
+            class="nav-btn blast-effect"
+            id="nextBtn"
+            onclick="navigateRoom(1)"
+          >
             Next →
           </button>
         </div>
@@ -709,11 +906,16 @@
       </div>
 
       <div class="actions">
-        <button class="action-btn mark-all-btn" onclick="markAllPresent()">
+        <!-- Added blast-effect class -->
+        <button
+          class="action-btn mark-all-btn blast-effect"
+          onclick="markAllPresent()"
+        >
           ✅ সবাইকে হাজির করুন
         </button>
+        <!-- Added blast-effect class -->
         <button
-          class="action-btn export-btn"
+          class="action-btn export-btn blast-effect"
           id="submitBtn"
           onclick="submitAttendance()"
         >
@@ -725,6 +927,21 @@
         <div class="progress-text" id="progressText"></div>
       </div>
     </div>
+
+    <!-- --- NEW: Loading Overlay HTML (Modified) --- -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+      <div class="loading-content">
+        <div class="loading-logo-wrapper">
+          <img
+            src="https://play-lh.googleusercontent.com/gufR1twVlU6_SzC-iIAD_8bLLf-XYVAwwwwJF-cphD32IX0GeHNLi4GrN42hRYDHg-A"
+            alt="Logo"
+            class="loading-logo"
+          />
+        </div>
+        <p class="loading-text">অ্যাটেনডেন্স জমা হচ্ছে...</p>
+      </div>
+    </div>
+    <!-- --- END NEW: Loading Overlay HTML (Modified) --- -->
 
     <script>
       const staffCredentials = {
@@ -786,7 +1003,7 @@
         103: [
           { reg: "36553", name: "LABIB RAHAMAN", class: "XI" },
           { reg: "41767", name: "NUR ALAM", class: "XI" },
-          { reg: "54535", name: "MD RAHMAN HOSSIN", class: "XI" },
+          { reg: "54535", name: "MD RAHMAN HOSSAIN", class: "XI" },
           { reg: "54709", name: "SAYAN SARDAR", class: "XI" },
           { reg: "55192", name: "ISHAYAT HASAN", class: "XI" },
           { reg: "70868", name: "ASIM AKTAR", class: "XI" },
@@ -1130,7 +1347,6 @@
       function fillStaffName() {
         const id = document.getElementById("staffIdInput").value.trim();
         const nameInput = document.getElementById("staffNameInput");
-
         if (staffCredentials[id]) {
           nameInput.value = staffCredentials[id].name;
         } else {
@@ -1223,7 +1439,7 @@
           if (studentsData[room]) {
             // Ensure room data exists
             const button = document.createElement("button");
-            button.className = "room-btn";
+            button.className = "room-btn blast-effect"; // Added blast-effect class
             button.textContent = `Room ${room} (${studentsData[room].length})`;
             button.onclick = () => switchToRoom(index);
             roomButtonsContainer.appendChild(button);
@@ -1349,7 +1565,8 @@
                 }">
                   ${attendanceStatus === "present" ? "✓ হাজির" : "✗ অনুপস্থিত"}
                 </div>
-                <button class="toggle-btn ${
+                <!-- Added blast-effect class to toggle button -->
+                <button class="toggle-btn blast-effect ${
                   attendanceStatus === "present"
                     ? "toggle-absent"
                     : "toggle-present"
@@ -1468,8 +1685,11 @@
       // Submit attendance to Google Sheet and Telegram
       async function submitAttendance() {
         const submitBtn = document.getElementById("submitBtn");
+        const loadingOverlay = document.getElementById("loadingOverlay"); // Get loading overlay
+
         submitBtn.disabled = true;
         submitBtn.textContent = "জমা হচ্ছে...";
+        loadingOverlay.classList.add("show"); // Show loading overlay
 
         const today = new Date();
         const dateString = `${today.getDate().toString().padStart(2, "0")}-${(
@@ -1518,12 +1738,13 @@
             mode: "no-cors", // Required for Google Apps Script POST requests
           });
 
-          // Since 'no-cors' mode is used, response.ok will always be false.
-          // We rely on the Apps Script to handle the request and return success/failure.
-          // For a more robust solution, consider using 'cors' mode and handling preflight requests
-          // or using Google's client libraries. For this simple setup, we assume success.
+          // Simulate a delay for the animation to be visible
+          await new Promise((resolve) => setTimeout(resolve, 1500)); // Added delay
 
           alert("অ্যাটেনডেন্স সফলভাবে জমা হয়েছে!");
+
+          // Hide loading overlay before transitioning back
+          loadingOverlay.classList.remove("show");
 
           setTimeout(() => {
             // attendance screen back login screen দেখানো হচ্ছে
@@ -1544,12 +1765,13 @@
             selectedFloor = "";
             floorRooms = []; // Clear floorRooms
             updateProgress(); // Reset progress display
-          }, 1000); // after 1 sec refresh
+          }, 500); // Shortened this timeout as the overlay hides first
         } catch (error) {
           console.error("Error submitting attendance:", error);
           alert(
             "অ্যাটেনডেন্স জমা দিতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"
           );
+          loadingOverlay.classList.remove("show"); // Hide overlay on error
         } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = "✅ অ্যাটেনডেন্স জমা দিন";
@@ -1565,9 +1787,35 @@
         updateProgress();
       }
 
+      // --- NEW: Blast Effect Triggering Function ---
+      function addBlastEffect(event) {
+        const button = event.currentTarget;
+        // Ensure the button has the base blast-effect class
+        if (!button.classList.contains("blast-effect")) {
+          button.classList.add("blast-effect");
+        }
+        button.classList.add("active");
+
+        // Remove the active class after the animation completes
+        button.addEventListener(
+          "animationend",
+          () => {
+            button.classList.remove("active");
+          },
+          { once: true }
+        ); // Ensure the listener is removed after one use
+      }
+
       // Initial setup (only login screen visible)
       document.addEventListener("DOMContentLoaded", () => {
-        // No need to call init() here, it will be called after login
+        // Apply blast effect to all relevant buttons
+        const buttonsToAnimate = document.querySelectorAll(
+          ".room-btn, .nav-btn, .action-btn, .toggle-btn, .login-box button"
+        );
+
+        buttonsToAnimate.forEach((button) => {
+          button.addEventListener("click", addBlastEffect);
+        });
       });
     </script>
   </body>
