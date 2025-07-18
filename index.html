@@ -752,7 +752,7 @@
 
       // Google Apps Script Web App URL (Replace with your deployed URL)
       const WEB_APP_URL =
-        "https://script.google.com/macros/s/AKfycbwYcBeXON7B3O96dk7bZZ9jI4N3femf2q8SwKqe1SJp1e2q_c5XnDMRbdmszpLtguf0Og/exec";
+        "https://script.google.com/macros/s/AKfycbwbxRbjoOv_MEbjTLXgvmJsStemXaX47F-THl-OaKciR3TpjoWuJv0IVPk2KZfHBcfDvw/exec"; // REPLACE WITH YOUR DEPLOYED WEB APP URL
 
       const studentsData = {
         101: [
@@ -1281,14 +1281,9 @@
           document.getElementById("searchInput").value = "";
           document.getElementById("searchResults").innerHTML = "";
           setTimeout(() => {
-            // Clear login fields after successful search/highlight
-            document.getElementById("staffIdInput").value = "";
-            document.getElementById("staffPasswordInput").value = "";
-            document.getElementById("staffNameInput").value = "";
-
             highlightedStudent = null;
             updateRoomDisplay();
-          }, 2000);
+          }, 2000); // Highlight for 2 seconds
         }
       }
 
